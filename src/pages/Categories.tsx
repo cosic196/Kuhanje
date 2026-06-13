@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, Tag } from 'lucide-react';
+import { Plus, Pencil, Trash2, Tag, Check, X } from 'lucide-react';
 import { useApp } from '../AppContext';
 import { generateId } from '../storage';
 
@@ -9,88 +9,95 @@ function CategorySection({
   onAdd,
   onEdit,
   onDelete,
-  color,
+  badgeClass,
 }: {
   title: string;
   items: { id: string; name: string }[];
   onAdd: (name: string) => void;
   onEdit: (id: string, name: string) => void;
   onDelete: (id: string) => void;
-  color: string;
+  badgeClass: string;
 }) {
   const [newName, setNewName] = useState('');
   const [editId, setEditId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
 
+  const commitAdd = () => {
+    if (!newName.trim()) return;
+    onAdd(newName.trim());
+    setNewName('');
+  };
+
+  const commitEdit = () => {
+    if (!editName.trim()) return;
+    onEdit(editId!, editName.trim());
+    setEditId(null);
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-sm border p-5">
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">{title}</h2>
-      <div className="space-y-2 mb-4">
+    <div className="bg-white rounded-xl border p-4">
+      <h2 className="text-base font-semibold text-gray-800 mb-3">{title}</h2>
+
+      <div className="space-y-1.5 mb-4">
+        {items.length === 0 && (
+          <p className="text-sm text-gray-400 py-1">Nema kategorija.</p>
+        )}
         {items.map((cat) =>
           editId === cat.id ? (
-            <div key={cat.id} className="flex gap-2">
+            <div key={cat.id} className="flex gap-2 items-center">
               <input
-                className="flex-1 border rounded-lg px-3 py-1.5 text-sm"
+                className="flex-1 border rounded-xl px-3 py-2.5 text-sm"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && editName.trim()) {
-                    onEdit(cat.id, editName.trim());
-                    setEditId(null);
-                  }
+                  if (e.key === 'Enter') commitEdit();
                   if (e.key === 'Escape') setEditId(null);
                 }}
                 autoFocus
               />
-              <button
-                onClick={() => { if (editName.trim()) { onEdit(cat.id, editName.trim()); setEditId(null); } }}
-                className="px-3 py-1.5 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700"
-              >
-                Spremi
+              <button onClick={commitEdit} className="p-2.5 bg-amber-600 text-white rounded-xl">
+                <Check size={16} />
               </button>
-              <button
-                onClick={() => setEditId(null)}
-                className="px-3 py-1.5 border text-sm rounded-lg hover:bg-gray-50"
-              >
-                Odustani
+              <button onClick={() => setEditId(null)} className="p-2.5 border rounded-xl text-gray-500">
+                <X size={16} />
               </button>
             </div>
           ) : (
-            <div key={cat.id} className="flex items-center justify-between group">
-              <span className={`text-sm px-2 py-0.5 rounded-full ${color}`}>{cat.name}</span>
-              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div key={cat.id} className="flex items-center justify-between gap-2 py-1">
+              <span className={`text-sm px-2.5 py-1 rounded-full ${badgeClass}`}>{cat.name}</span>
+              <div className="flex gap-1">
                 <button
                   onClick={() => { setEditId(cat.id); setEditName(cat.name); }}
-                  className="p-1 text-gray-400 hover:text-amber-600"
+                  className="p-2.5 text-gray-400 hover:text-amber-600 rounded-lg active:bg-amber-50"
                 >
-                  <Pencil size={14} />
+                  <Pencil size={15} />
                 </button>
-                <button onClick={() => onDelete(cat.id)} className="p-1 text-gray-400 hover:text-red-500">
-                  <Trash2 size={14} />
+                <button
+                  onClick={() => onDelete(cat.id)}
+                  className="p-2.5 text-gray-400 hover:text-red-500 rounded-lg active:bg-red-50"
+                >
+                  <Trash2 size={15} />
                 </button>
               </div>
             </div>
           )
         )}
       </div>
+
       <div className="flex gap-2">
         <input
-          className="flex-1 border rounded-lg px-3 py-1.5 text-sm"
+          className="flex-1 border rounded-xl px-3 py-2.5 text-sm"
           placeholder="Nova kategorija..."
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && newName.trim()) {
-              onAdd(newName.trim());
-              setNewName('');
-            }
-          }}
+          onKeyDown={(e) => { if (e.key === 'Enter') commitAdd(); }}
         />
         <button
-          onClick={() => { if (newName.trim()) { onAdd(newName.trim()); setNewName(''); } }}
-          className="px-3 py-1.5 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700 flex items-center gap-1"
+          onClick={commitAdd}
+          disabled={!newName.trim()}
+          className="px-4 py-2.5 bg-amber-600 text-white text-sm rounded-xl hover:bg-amber-700 disabled:opacity-40 flex items-center gap-1 active:scale-95 transition-transform"
         >
-          <Plus size={15} /> Dodaj
+          <Plus size={16} />
         </button>
       </div>
     </div>
@@ -104,33 +111,29 @@ export default function Categories() {
     setData((p) => ({ ...p, mealCategories: [...p.mealCategories, { id: generateId('mc'), name }] }));
   const editMealCat = (id: string, name: string) =>
     setData((p) => ({ ...p, mealCategories: p.mealCategories.map((c) => c.id === id ? { ...c, name } : c) }));
-  const deleteMealCat = (id: string) => {
-    if (!confirm('Obrisati ovu kategoriju?')) return;
+  const deleteMealCat = (id: string) =>
     setData((p) => ({ ...p, mealCategories: p.mealCategories.filter((c) => c.id !== id) }));
-  };
 
   const addSideCat = (name: string) =>
     setData((p) => ({ ...p, sideCategories: [...p.sideCategories, { id: generateId('sc'), name }] }));
   const editSideCat = (id: string, name: string) =>
     setData((p) => ({ ...p, sideCategories: p.sideCategories.map((c) => c.id === id ? { ...c, name } : c) }));
-  const deleteSideCat = (id: string) => {
-    if (!confirm('Obrisati ovu kategoriju?')) return;
+  const deleteSideCat = (id: string) =>
     setData((p) => ({ ...p, sideCategories: p.sideCategories.filter((c) => c.id !== id) }));
-  };
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2 mb-6">
-        <Tag className="text-amber-600" /> Kategorije
+      <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4">
+        <Tag className="text-amber-600" size={22} /> Kategorije
       </h1>
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="space-y-4">
         <CategorySection
           title="Kategorije jela"
           items={data.mealCategories}
           onAdd={addMealCat}
           onEdit={editMealCat}
           onDelete={deleteMealCat}
-          color="text-amber-700 bg-amber-50"
+          badgeClass="text-amber-700 bg-amber-50"
         />
         <CategorySection
           title="Kategorije dodataka"
@@ -138,7 +141,7 @@ export default function Categories() {
           onAdd={addSideCat}
           onEdit={editSideCat}
           onDelete={deleteSideCat}
-          color="text-blue-700 bg-blue-50"
+          badgeClass="text-blue-700 bg-blue-50"
         />
       </div>
     </div>

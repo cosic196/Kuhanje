@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, ShoppingBasket, Star } from 'lucide-react';
+import { Plus, Pencil, Trash2, ShoppingBasket, Star, Check, X } from 'lucide-react';
 import { useApp } from '../AppContext';
 import type { Ingredient } from '../types';
 import { generateId } from '../storage';
@@ -30,7 +30,7 @@ export default function Ingredients() {
     setNewIsCommon(false);
   };
 
-  const save = () => {
+  const saveEdit = () => {
     if (!editName.trim()) return;
     setData((p) => ({
       ...p,
@@ -42,7 +42,6 @@ export default function Ingredients() {
   };
 
   const remove = (id: string) => {
-    if (!confirm('Obrisati ovaj sastojak?')) return;
     setData((p) => ({ ...p, ingredients: p.ingredients.filter((i) => i.id !== id) }));
   };
 
@@ -52,47 +51,54 @@ export default function Ingredients() {
     setEditIsCommon(ing.isCommon);
   };
 
-  const renderList = (items: typeof filtered, label: string, badgeClass: string) => (
-    <div className="mb-6">
-      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">{label}</h2>
+  const renderList = (items: typeof filtered, label: string) => (
+    <div className="mb-4">
+      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 px-1">{label}</p>
       {items.length === 0 ? (
-        <p className="text-sm text-gray-400">Nema sastojaka u ovoj kategoriji.</p>
+        <p className="text-sm text-gray-400 px-1 py-2">Nema sastojaka.</p>
       ) : (
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           {items.map((ing) =>
             editId === ing.id ? (
-              <div key={ing.id} className="flex gap-2 items-center bg-amber-50 rounded-lg p-2">
+              <div key={ing.id} className="flex gap-2 items-center bg-amber-50 rounded-xl p-2">
                 <input
-                  className="flex-1 border rounded-lg px-3 py-1.5 text-sm"
+                  className="flex-1 border rounded-xl px-3 py-2.5 text-sm bg-white"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   autoFocus
-                  onKeyDown={(e) => { if (e.key === 'Enter') save(); if (e.key === 'Escape') setEditId(null); }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditId(null); }}
                 />
-                <label className="flex items-center gap-1 text-xs text-gray-600 whitespace-nowrap">
+                <label className="flex items-center gap-1 text-xs text-gray-600 whitespace-nowrap flex-shrink-0">
                   <input
                     type="checkbox"
                     checked={editIsCommon}
                     onChange={(e) => setEditIsCommon(e.target.checked)}
-                    className="accent-amber-600"
+                    className="accent-amber-600 w-4 h-4"
                   />
-                  Zajednički
+                  Zajedn.
                 </label>
-                <button onClick={save} className="px-3 py-1.5 bg-amber-600 text-white text-sm rounded-lg hover:bg-amber-700">Spremi</button>
-                <button onClick={() => setEditId(null)} className="px-3 py-1.5 border text-sm rounded-lg hover:bg-gray-50">Odustani</button>
+                <button onClick={saveEdit} className="p-2.5 bg-amber-600 text-white rounded-xl flex-shrink-0">
+                  <Check size={15} />
+                </button>
+                <button onClick={() => setEditId(null)} className="p-2.5 border rounded-xl text-gray-500 flex-shrink-0">
+                  <X size={15} />
+                </button>
               </div>
             ) : (
-              <div key={ing.id} className="flex items-center justify-between group px-2 py-1.5 rounded-lg hover:bg-gray-50">
-                <span className="text-sm flex items-center gap-2">
-                  {ing.name}
-                  <span className={`text-xs px-1.5 py-0.5 rounded ${badgeClass}`}>{ing.isCommon ? 'Zajednički' : 'Ostalo'}</span>
-                </span>
-                <div className="flex gap-1 opacity-0 group-hover:opacity-100">
-                  <button onClick={() => startEdit(ing)} className="p-1 text-gray-400 hover:text-amber-600">
-                    <Pencil size={14} />
+              <div key={ing.id} className="flex items-center justify-between bg-white rounded-xl border px-4 py-3">
+                <span className="text-sm text-gray-800">{ing.name}</span>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => startEdit(ing)}
+                    className="p-2.5 text-gray-400 hover:text-amber-600 rounded-lg active:bg-amber-50"
+                  >
+                    <Pencil size={15} />
                   </button>
-                  <button onClick={() => remove(ing.id)} className="p-1 text-gray-400 hover:text-red-500">
-                    <Trash2 size={14} />
+                  <button
+                    onClick={() => remove(ing.id)}
+                    className="p-2.5 text-gray-400 hover:text-red-500 rounded-lg active:bg-red-50"
+                  >
+                    <Trash2 size={15} />
                   </button>
                 </div>
               </div>
@@ -105,52 +111,51 @@ export default function Ingredients() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2 mb-6">
-        <ShoppingBasket className="text-amber-600" /> Sastojci
+      <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4">
+        <ShoppingBasket className="text-amber-600" size={22} /> Sastojci
       </h1>
 
-      <div className="bg-white rounded-xl shadow-sm border p-5 mb-6">
-        <h2 className="text-base font-semibold text-gray-700 mb-3">Dodaj novi sastojak</h2>
-        <div className="flex gap-2 items-center flex-wrap">
+      {/* Add new */}
+      <div className="bg-white rounded-xl border p-4 mb-4">
+        <p className="text-sm font-semibold text-gray-700 mb-3">Dodaj novi sastojak</p>
+        <div className="flex gap-2 mb-2">
           <input
-            className="flex-1 border rounded-lg px-3 py-2 text-sm min-w-40"
+            className="flex-1 border rounded-xl px-4 py-3 text-sm"
             placeholder="Naziv sastojka..."
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') add(); }}
           />
-          <label className="flex items-center gap-1.5 text-sm text-gray-700 whitespace-nowrap">
-            <input
-              type="checkbox"
-              checked={newIsCommon}
-              onChange={(e) => setNewIsCommon(e.target.checked)}
-              className="accent-amber-600"
-            />
-            <Star size={14} className="text-amber-500" />
-            Zajednički sastojak
-          </label>
           <button
             onClick={add}
             disabled={!newName.trim()}
-            className="flex items-center gap-1 bg-amber-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-amber-700 disabled:opacity-50"
+            className="px-4 py-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 disabled:opacity-40 active:scale-95 transition-transform"
           >
-            <Plus size={16} /> Dodaj
+            <Plus size={18} />
           </button>
         </div>
-        <p className="text-xs text-gray-400 mt-2">
-          Zajednički sastojci (sol, ulje, šećer...) uvijek su u popisu za kupovinu.
-        </p>
+        <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer py-1">
+          <input
+            type="checkbox"
+            checked={newIsCommon}
+            onChange={(e) => setNewIsCommon(e.target.checked)}
+            className="accent-amber-600 w-4 h-4"
+          />
+          <Star size={14} className="text-amber-500" />
+          Zajednički sastojak (sol, ulje, šećer...)
+        </label>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border p-5">
+      {/* Search + list */}
+      <div className="bg-white rounded-xl border p-4">
         <input
-          className="w-full border rounded-lg px-3 py-2 text-sm mb-4"
+          className="w-full border rounded-xl px-4 py-3 text-sm mb-4"
           placeholder="Pretraži sastojke..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        {renderList(common, '⭐ Zajednički sastojci', 'text-amber-700 bg-amber-50')}
-        {renderList(notCommon, 'Ostali sastojci', 'text-gray-500 bg-gray-100')}
+        {renderList(common, '⭐ Zajednički sastojci')}
+        {renderList(notCommon, 'Ostali sastojci')}
       </div>
     </div>
   );
