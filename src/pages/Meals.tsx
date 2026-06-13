@@ -128,8 +128,6 @@ export default function Meals() {
   const toggleCat = (id: string) =>
     setCollapsedCats((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
-  const getCategoryName = (id: string) =>
-    data.mealCategories.find((c) => c.id === id)?.name ?? 'Ostalo';
   const getIngredientName = (id: string) =>
     data.ingredients.find((i) => i.id === id)?.name ?? '?';
   const getSideName = (id: string) =>
