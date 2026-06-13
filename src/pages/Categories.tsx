@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Pencil, Trash2, Tag, Check, X } from 'lucide-react';
 import { useApp } from '../AppContext';
+import { useLang } from '../LanguageContext';
 import { generateId } from '../storage';
 
 function CategorySection({
@@ -10,6 +11,8 @@ function CategorySection({
   onEdit,
   onDelete,
   badgeClass,
+  noCatsText,
+  newCatPlaceholder,
 }: {
   title: string;
   items: { id: string; name: string }[];
@@ -17,6 +20,8 @@ function CategorySection({
   onEdit: (id: string, name: string) => void;
   onDelete: (id: string) => void;
   badgeClass: string;
+  noCatsText: string;
+  newCatPlaceholder: string;
 }) {
   const [newName, setNewName] = useState('');
   const [editId, setEditId] = useState<string | null>(null);
@@ -40,7 +45,7 @@ function CategorySection({
 
       <div className="space-y-1.5 mb-4">
         {items.length === 0 && (
-          <p className="text-sm text-gray-400 py-1">Nema kategorija.</p>
+          <p className="text-sm text-gray-400 py-1">{noCatsText}</p>
         )}
         {items.map((cat) =>
           editId === cat.id ? (
@@ -86,7 +91,7 @@ function CategorySection({
       <div className="flex gap-2">
         <input
           className="flex-1 border rounded-xl px-3 py-2.5 text-sm"
-          placeholder="Nova kategorija..."
+          placeholder={newCatPlaceholder}
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') commitAdd(); }}
@@ -105,6 +110,7 @@ function CategorySection({
 
 export default function Categories() {
   const { data, setData } = useApp();
+  const { t } = useLang();
 
   const addMealCat = (name: string) =>
     setData((p) => ({ ...p, mealCategories: [...p.mealCategories, { id: generateId('mc'), name }] }));
@@ -123,24 +129,28 @@ export default function Categories() {
   return (
     <div>
       <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4">
-        <Tag className="text-amber-600" size={22} /> Kategorije
+        <Tag className="text-amber-600" size={22} /> {t.categories.title}
       </h1>
       <div className="space-y-4">
         <CategorySection
-          title="Kategorije jela"
+          title={t.categories.mealCats}
           items={[...data.mealCategories].sort((a, b) => a.name.localeCompare(b.name, 'hr'))}
           onAdd={addMealCat}
           onEdit={editMealCat}
           onDelete={deleteMealCat}
           badgeClass="text-amber-700 bg-amber-50"
+          noCatsText={t.categories.noCats}
+          newCatPlaceholder={t.categories.newCatPlaceholder}
         />
         <CategorySection
-          title="Kategorije priloga"
+          title={t.categories.sideCats}
           items={[...data.sideCategories].sort((a, b) => a.name.localeCompare(b.name, 'hr'))}
           onAdd={addSideCat}
           onEdit={editSideCat}
           onDelete={deleteSideCat}
           badgeClass="text-blue-700 bg-blue-50"
+          noCatsText={t.categories.noCats}
+          newCatPlaceholder={t.categories.newCatPlaceholder}
         />
       </div>
     </div>

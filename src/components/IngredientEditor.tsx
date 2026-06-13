@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Plus, Trash2, Search, X } from 'lucide-react';
 import { useApp } from '../AppContext';
+import { useLang } from '../LanguageContext';
 import type { IngredientAmount } from '../types';
 import { generateId } from '../storage';
 
 function IngredientSearch({ value, onSelect }: { value: string; onSelect: (id: string) => void }) {
   const { data, setData } = useApp();
+  const { t } = useLang();
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
 
@@ -57,7 +59,7 @@ function IngredientSearch({ value, onSelect }: { value: string; onSelect: (id: s
         <Search size={13} className="text-gray-400 flex-shrink-0" />
         <input
           className="flex-1 outline-none min-w-0 bg-transparent placeholder:text-gray-400"
-          placeholder="Traži namirnicu..."
+          placeholder={t.ingredientEditor.searchPlaceholder}
           value={query}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
@@ -68,7 +70,7 @@ function IngredientSearch({ value, onSelect }: { value: string; onSelect: (id: s
       {open && (
         <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-white border rounded-xl shadow-lg max-h-52 overflow-y-auto">
           {filtered.length === 0 && !query.trim() && (
-            <p className="text-sm text-gray-400 px-3 py-3 text-center">Upiši naziv za pretragu ili dodavanje.</p>
+            <p className="text-sm text-gray-400 px-3 py-3 text-center">{t.ingredientEditor.emptyMessage}</p>
           )}
           {filtered.map((ing) => (
             <button
@@ -88,7 +90,7 @@ function IngredientSearch({ value, onSelect }: { value: string; onSelect: (id: s
               onClick={handleCreate}
               className="w-full text-left px-3 py-2.5 text-sm text-amber-600 hover:bg-amber-50 border-t flex items-center gap-1.5 font-medium"
             >
-              <Plus size={14} /> Dodaj novu namirnicu &ldquo;{query.trim()}&rdquo;
+              <Plus size={14} /> {t.ingredientEditor.addNewIngredient(query.trim())}
             </button>
           )}
         </div>
@@ -98,6 +100,7 @@ function IngredientSearch({ value, onSelect }: { value: string; onSelect: (id: s
 }
 
 export default function IngredientEditor({ items, onChange }: { items: IngredientAmount[]; onChange: (items: IngredientAmount[]) => void }) {
+  const { t } = useLang();
   const add = () => onChange([...items, { ingredientId: '', amount: '', unit: '' }]);
   const update = (i: number, field: keyof IngredientAmount, value: string) => {
     const next = [...items];
@@ -116,13 +119,13 @@ export default function IngredientEditor({ items, onChange }: { items: Ingredien
           />
           <input
             className="w-16 border rounded-xl px-2 py-2.5 text-sm text-center flex-shrink-0"
-            placeholder="Kol."
+            placeholder={t.ingredientEditor.amountPlaceholder}
             value={item.amount}
             onChange={(e) => update(i, 'amount', e.target.value)}
           />
           <input
             className="w-14 border rounded-xl px-2 py-2.5 text-sm text-center flex-shrink-0"
-            placeholder="Jed."
+            placeholder={t.ingredientEditor.unitPlaceholder}
             value={item.unit}
             onChange={(e) => update(i, 'unit', e.target.value)}
           />
@@ -140,7 +143,7 @@ export default function IngredientEditor({ items, onChange }: { items: Ingredien
         onClick={add}
         className="flex items-center gap-1.5 text-sm text-amber-600 hover:text-amber-800 py-1"
       >
-        <Plus size={16} /> Dodaj namirnicu
+        <Plus size={16} /> {t.ingredientEditor.addIngredient}
       </button>
     </div>
   );

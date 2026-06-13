@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Pencil, Trash2, Layers, Check, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { useApp } from '../AppContext';
+import { useLang } from '../LanguageContext';
 import Modal from '../components/Modal';
 import IngredientEditor from '../components/IngredientEditor';
 import type { Side } from '../types';
@@ -15,6 +16,7 @@ const empty = (): Omit<Side, 'id'> => ({
 
 export default function Sides() {
   const { data, setData } = useApp();
+  const { t } = useLang();
   const [editing, setEditing] = useState<Side | null>(null);
   const [isNew, setIsNew] = useState(false);
   const [form, setForm] = useState(empty());
@@ -47,7 +49,7 @@ export default function Sides() {
   };
 
   const remove = (id: string) => {
-    if (!confirm('Obrisati ovaj prilog?')) return;
+    if (!confirm(t.sides.deleteConfirm)) return;
     setData((prev) => ({ ...prev, sides: prev.sides.filter((s) => s.id !== id) }));
   };
 
@@ -80,27 +82,27 @@ export default function Sides() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold text-gray-800">Prilozi</h1>
+        <h1 className="text-xl font-bold text-gray-800">{t.sides.title}</h1>
         <button
           onClick={openNew}
           className="flex items-center gap-1.5 bg-amber-600 text-white px-4 py-2.5 rounded-xl font-medium text-sm active:scale-95 transition-transform"
         >
-          <Plus size={18} /> Dodaj
+          <Plus size={18} /> {t.sides.addBtn}
         </button>
       </div>
 
       {data.sides.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
           <Layers size={48} className="mx-auto mb-3 opacity-20" />
-          <p className="font-medium">Nema dodanih priloga</p>
-          <p className="text-sm mt-1">Dodajte prve priloge (tjestenina, krumpir...)</p>
+          <p className="font-medium">{t.sides.noSides}</p>
+          <p className="text-sm mt-1">{t.sides.noSidesSub}</p>
         </div>
       ) : (() => {
         const groups = sortedCategories
           .map((cat) => ({ cat, items: sortedSides.filter((s) => s.categoryId === cat.id) }))
           .filter(({ items }) => items.length > 0);
         const orphans = sortedSides.filter((s) => !data.sideCategories.some((c) => c.id === s.categoryId));
-        if (orphans.length > 0) groups.push({ cat: { id: '__other', name: 'Ostalo' }, items: orphans });
+        if (orphans.length > 0) groups.push({ cat: { id: '__other', name: t.sides.other }, items: orphans });
 
         return (
           <div className="space-y-4">
@@ -132,7 +134,7 @@ export default function Sides() {
                               <div className="flex-1 min-w-0">
                                 <p className="font-semibold text-gray-800 truncate">{s.name}</p>
                                 {s.ingredients.length > 0 && (
-                                  <span className="text-xs text-gray-400 mt-1 block">{s.ingredients.length} nam.</span>
+                                  <span className="text-xs text-gray-400 mt-1 block">{t.sides.ingredientCount(s.ingredients.length)}</span>
                                 )}
                               </div>
                               <div className="flex gap-1 flex-shrink-0 items-center">
@@ -157,7 +159,7 @@ export default function Sides() {
                               <div className="border-t bg-gray-50 px-4 py-3 space-y-3">
                                 {s.ingredients.length > 0 && (
                                   <div>
-                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Namirnice</p>
+                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t.sides.ingredientsSection}</p>
                                     <ul className="space-y-1">
                                       {s.ingredients.map((ing, i) => (
                                         <li key={i} className="flex justify-between text-sm text-gray-700">
@@ -172,12 +174,12 @@ export default function Sides() {
                                 )}
                                 {s.recipe && (
                                   <div>
-                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Recept</p>
+                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t.sides.recipeSection}</p>
                                     <p className="text-sm text-gray-600 whitespace-pre-wrap">{s.recipe}</p>
                                   </div>
                                 )}
                                 {s.ingredients.length === 0 && !s.recipe && (
-                                  <p className="text-sm text-gray-400">Nema dodatnih detalja.</p>
+                                  <p className="text-sm text-gray-400">{t.sides.noDetails}</p>
                                 )}
                               </div>
                             )}
@@ -194,19 +196,19 @@ export default function Sides() {
       })()}
 
       {(isNew || editing) && (
-        <Modal title={isNew ? 'Novi prilog' : 'Uredi prilog'} onClose={close} wide>
+        <Modal title={isNew ? t.sides.modalTitleNew : t.sides.modalTitleEdit} onClose={close} wide>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Naziv *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.sides.nameLabel}</label>
               <input
                 className="w-full border rounded-xl px-4 py-3"
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                placeholder="Npr. Tjestenina"
+                placeholder={t.sides.namePlaceholder}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Kategorija</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.sides.categoryLabel}</label>
               <div className="flex gap-2">
                 <select
                   className="flex-1 border rounded-xl px-4 py-3"
@@ -223,7 +225,7 @@ export default function Sides() {
                     onClick={() => setShowNewCat(true)}
                     className="px-3 py-2.5 border rounded-xl text-amber-600 hover:bg-amber-50 text-sm font-medium flex items-center gap-1 flex-shrink-0"
                   >
-                    <Plus size={14} /> Nova
+                    <Plus size={14} /> {t.sides.newCategoryBtn}
                   </button>
                 )}
               </div>
@@ -231,7 +233,7 @@ export default function Sides() {
                 <div className="flex gap-2 mt-2">
                   <input
                     className="flex-1 border rounded-xl px-3 py-2.5 text-sm"
-                    placeholder="Naziv kategorije..."
+                    placeholder={t.sides.categoryNamePlaceholder}
                     value={newCatName}
                     onChange={(e) => setNewCatName(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') createCategory(); if (e.key === 'Escape') { setShowNewCat(false); setNewCatName(''); } }}
@@ -255,19 +257,19 @@ export default function Sides() {
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Namirnice</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.sides.ingredientsLabel}</label>
               <IngredientEditor
                 items={form.ingredients}
                 onChange={(items) => setForm((f) => ({ ...f, ingredients: items }))}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Recept</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.sides.recipeLabel}</label>
               <textarea
                 className="w-full border rounded-xl px-4 py-3 text-sm min-h-[80px] resize-none"
                 value={form.recipe}
                 onChange={(e) => setForm((f) => ({ ...f, recipe: e.target.value }))}
-                placeholder="Upute za pripremu..."
+                placeholder={t.sides.recipePlaceholder}
               />
             </div>
             <button
@@ -275,10 +277,10 @@ export default function Sides() {
               disabled={!form.name.trim()}
               className="w-full bg-amber-600 text-white py-3.5 rounded-xl hover:bg-amber-700 disabled:opacity-50 font-medium text-base active:scale-95 transition-transform"
             >
-              Spremi
+              {t.sides.saveBtn}
             </button>
             <button onClick={close} className="w-full border py-3.5 rounded-xl font-medium text-gray-600">
-              Odustani
+              {t.sides.cancelBtn}
             </button>
           </div>
         </Modal>

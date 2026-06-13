@@ -1,5 +1,6 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AppProvider } from './AppContext';
+import { LanguageProvider, useLang } from './LanguageContext';
 import Layout from './components/Layout';
 import Plans from './pages/Plans';
 import PlanDetail from './pages/PlanDetail';
@@ -8,8 +9,15 @@ import Sides from './pages/Sides';
 import Categories from './pages/Categories';
 import Ingredients from './pages/Ingredients';
 import Rules from './pages/Rules';
+import LanguageSelect from './pages/LanguageSelect';
 
-export default function App() {
+function AppContent() {
+  const { lang } = useLang();
+
+  if (lang === null) {
+    return <LanguageSelect />;
+  }
+
   return (
     <AppProvider>
       <HashRouter>
@@ -26,5 +34,13 @@ export default function App() {
         </Routes>
       </HashRouter>
     </AppProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 }

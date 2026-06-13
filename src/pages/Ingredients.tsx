@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Plus, Pencil, Trash2, ShoppingBasket, Star, Check, X } from 'lucide-react';
 import { useApp } from '../AppContext';
+import { useLang } from '../LanguageContext';
 import type { Ingredient } from '../types';
 import { generateId } from '../storage';
 
 export default function Ingredients() {
   const { data, setData } = useApp();
+  const { t } = useLang();
   const [newName, setNewName] = useState('');
   const [newIsCommon, setNewIsCommon] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -55,7 +57,7 @@ export default function Ingredients() {
     <div className="mb-4">
       <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 px-1">{label}</p>
       {items.length === 0 ? (
-        <p className="text-sm text-gray-400 px-1 py-2">Nema namirnica.</p>
+        <p className="text-sm text-gray-400 px-1 py-2">{t.ingredients.noIngredients}</p>
       ) : (
         <div className="space-y-1.5">
           {items.map((ing) =>
@@ -74,7 +76,7 @@ export default function Ingredients() {
                     onChange={(e) => setEditIsCommon(e.target.checked)}
                     className="accent-amber-600 w-4 h-4"
                   />
-                  Stalna
+                  {t.ingredients.editCommonLabel}
                 </label>
                 <button onClick={saveEdit} className="p-2.5 bg-amber-600 text-white rounded-xl flex-shrink-0">
                   <Check size={15} />
@@ -111,16 +113,15 @@ export default function Ingredients() {
   return (
     <div>
       <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4">
-        <ShoppingBasket className="text-amber-600" size={22} /> Namirnice
+        <ShoppingBasket className="text-amber-600" size={22} /> {t.ingredients.title}
       </h1>
 
-      {/* Add new */}
       <div className="bg-white rounded-xl border p-4 mb-4">
-        <p className="text-sm font-semibold text-gray-700 mb-3">Dodaj novu namirnicu</p>
+        <p className="text-sm font-semibold text-gray-700 mb-3">{t.ingredients.addTitle}</p>
         <div className="flex gap-2 mb-2">
           <input
             className="flex-1 border rounded-xl px-4 py-3 text-sm"
-            placeholder="Naziv namirnice..."
+            placeholder={t.ingredients.namePlaceholder}
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') add(); }}
@@ -141,20 +142,19 @@ export default function Ingredients() {
             className="accent-amber-600 w-4 h-4"
           />
           <Star size={14} className="text-amber-500" />
-          Stalna namirnica (sol, ulje, šećer...)
+          {t.ingredients.isCommon}
         </label>
       </div>
 
-      {/* Search + list */}
       <div className="bg-white rounded-xl border p-4">
         <input
           className="w-full border rounded-xl px-4 py-3 text-sm mb-4"
-          placeholder="Pretraži namirnice..."
+          placeholder={t.ingredients.searchPlaceholder}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        {renderList(common, '⭐ Stalne namirnice')}
-        {renderList(notCommon, 'Ostale namirnice')}
+        {renderList(common, t.ingredients.commonLabel)}
+        {renderList(notCommon, t.ingredients.otherLabel)}
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Settings, Plus, Trash2, Pencil, Check, X, Download, Upload, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useApp } from '../AppContext';
+import { useLang } from '../LanguageContext';
 import type { NoRepeatSideCategoryRule, NoRepeatMealCategoryRule, RequiredCategoryRule, NoRecentMealsRule } from '../types';
 import { generateId, exportData, importData } from '../storage';
 
@@ -37,6 +38,7 @@ const emptyRequired = (): Omit<RequiredCategoryRule, 'id'> => ({
 
 export default function Rules() {
   const { data, setData } = useApp();
+  const { t } = useLang();
 
   const noRepeatSideRule: NoRepeatSideCategoryRule =
     (data.rules.find((r) => r.type === 'no_repeat_side_category') as NoRepeatSideCategoryRule | undefined)
@@ -126,12 +128,12 @@ export default function Rules() {
     if (!file) return;
     try {
       const imported = await importData(file);
-      if (confirm('Ovo će zamijeniti sve trenutne podatke. Nastaviti?')) {
+      if (confirm(t.rules.importConfirm)) {
         setData(() => imported);
-        alert('Podaci uspješno uvezeni!');
+        alert(t.rules.importSuccess);
       }
     } catch {
-      alert('Greška pri uvozu datoteke!');
+      alert(t.rules.importError);
     }
     e.target.value = '';
   };
@@ -143,7 +145,7 @@ export default function Rules() {
       <div className="space-y-3 bg-amber-50 rounded-xl p-4 border border-amber-100">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-gray-500 block mb-1">Tip</label>
+            <label className="text-xs text-gray-500 block mb-1">{t.rules.typeLabel}</label>
             <select
               className="w-full border rounded-xl px-3 py-2.5 text-sm bg-white"
               value={form.categoryType}
@@ -151,18 +153,18 @@ export default function Rules() {
                 setForm({ ...form, categoryType: e.target.value as 'meal' | 'side', categoryId: '' })
               }
             >
-              <option value="meal">Jelo</option>
-              <option value="side">Prilog</option>
+              <option value="meal">{t.rules.mealType}</option>
+              <option value="side">{t.rules.sideType}</option>
             </select>
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">Kategorija *</label>
+            <label className="text-xs text-gray-500 block mb-1">{t.rules.catLabel}</label>
             <select
               className="w-full border rounded-xl px-3 py-2.5 text-sm bg-white"
               value={form.categoryId}
               onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
             >
-              <option value="">-- Odaberi --</option>
+              <option value="">{t.rules.catPlaceholder}</option>
               {cats.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -171,7 +173,7 @@ export default function Rules() {
             </select>
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">Min. puta</label>
+            <label className="text-xs text-gray-500 block mb-1">{t.rules.minLabel}</label>
             <input
               type="number"
               min={1}
@@ -185,7 +187,7 @@ export default function Rules() {
             />
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">Max. puta</label>
+            <label className="text-xs text-gray-500 block mb-1">{t.rules.maxLabel}</label>
             <input
               type="number"
               min={form.minCount}
@@ -196,7 +198,7 @@ export default function Rules() {
             />
           </div>
           <div className="col-span-2">
-            <label className="text-xs text-gray-500 block mb-1">Svakih N dana</label>
+            <label className="text-xs text-gray-500 block mb-1">{t.rules.everyNLabel}</label>
             <input
               type="number"
               min={1}
@@ -213,13 +215,13 @@ export default function Rules() {
             disabled={!form.categoryId}
             className="flex-1 bg-amber-600 text-white py-3 rounded-xl text-sm font-medium disabled:opacity-40 flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
           >
-            <Check size={16} /> Spremi
+            <Check size={16} /> {t.rules.saveBtn}
           </button>
           <button
             onClick={cancelEdit}
             className="flex-1 border py-3 rounded-xl text-sm font-medium text-gray-600 flex items-center justify-center gap-1.5"
           >
-            <X size={16} /> Odustani
+            <X size={16} /> {t.rules.cancelBtn}
           </button>
         </div>
       </div>
@@ -229,15 +231,15 @@ export default function Rules() {
   return (
     <div>
       <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4">
-        <Settings className="text-amber-600" size={22} /> Pravila i postavke
+        <Settings className="text-amber-600" size={22} /> {t.rules.title}
       </h1>
 
       {/* Plan settings */}
       <div className="bg-white rounded-xl border p-4 mb-4">
-        <p className="font-semibold text-gray-700 mb-3 text-sm">Postavke plana</p>
+        <p className="font-semibold text-gray-700 mb-3 text-sm">{t.rules.planSettings}</p>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-gray-500 block mb-1.5">Trajanje plana (dana)</label>
+            <label className="text-xs text-gray-500 block mb-1.5">{t.rules.durationLabel}</label>
             <input
               type="number"
               min={1}
@@ -253,7 +255,7 @@ export default function Rules() {
             />
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1.5">Ne ponavljaj u planu (dana)</label>
+            <label className="text-xs text-gray-500 block mb-1.5">{t.rules.noRepeatLabel}</label>
             <input
               type="number"
               min={1}
@@ -274,7 +276,7 @@ export default function Rules() {
       {/* No repeat side category rule */}
       <div className={`bg-white rounded-xl border p-4 mb-3 ${!noRepeatSideRule.enabled ? 'opacity-60' : ''}`}>
         <div className="flex items-center justify-between mb-1">
-          <p className="font-semibold text-gray-800 text-sm">Ne ponavljaj vrstu priloga</p>
+          <p className="font-semibold text-gray-800 text-sm">{t.rules.noRepeatSideTitle}</p>
           <button
             onClick={() => updateSingletonRule({ ...noRepeatSideRule, enabled: !noRepeatSideRule.enabled })}
             className="text-amber-600 flex-shrink-0"
@@ -286,12 +288,10 @@ export default function Rules() {
             )}
           </button>
         </div>
-        <p className="text-xs text-gray-400 mb-3">
-          Ista kategorija priloga ne smije se pojaviti unutar N uzastopnih dana.
-        </p>
+        <p className="text-xs text-gray-400 mb-3">{t.rules.noRepeatSideDesc}</p>
         {noRepeatSideRule.enabled && (
           <div className="flex items-center gap-3">
-            <label className="text-sm text-gray-600">Prozor dana:</label>
+            <label className="text-sm text-gray-600">{t.rules.windowDaysLabel}</label>
             <input
               type="number"
               min={2}
@@ -309,7 +309,7 @@ export default function Rules() {
       {/* No repeat meal category rule */}
       <div className={`bg-white rounded-xl border p-4 mb-3 ${!noRepeatMealRule.enabled ? 'opacity-60' : ''}`}>
         <div className="flex items-center justify-between mb-1">
-          <p className="font-semibold text-gray-800 text-sm">Ne ponavljaj vrstu jela</p>
+          <p className="font-semibold text-gray-800 text-sm">{t.rules.noRepeatMealTitle}</p>
           <button
             onClick={() => updateSingletonRule({ ...noRepeatMealRule, enabled: !noRepeatMealRule.enabled })}
             className="text-amber-600 flex-shrink-0"
@@ -321,12 +321,10 @@ export default function Rules() {
             )}
           </button>
         </div>
-        <p className="text-xs text-gray-400 mb-3">
-          Ista kategorija jela ne smije se pojaviti unutar N uzastopnih dana.
-        </p>
+        <p className="text-xs text-gray-400 mb-3">{t.rules.noRepeatMealDesc}</p>
         {noRepeatMealRule.enabled && (
           <div className="flex items-center gap-3">
-            <label className="text-sm text-gray-600">Prozor dana:</label>
+            <label className="text-sm text-gray-600">{t.rules.windowDaysLabel}</label>
             <input
               type="number"
               min={2}
@@ -344,7 +342,7 @@ export default function Rules() {
       {/* No recent meals rule */}
       <div className={`bg-white rounded-xl border p-4 mb-4 ${!noRecentRule.enabled ? 'opacity-60' : ''}`}>
         <div className="flex items-center justify-between mb-1">
-          <p className="font-semibold text-gray-800 text-sm">Izbjegavaj nedavna jela</p>
+          <p className="font-semibold text-gray-800 text-sm">{t.rules.noRecentTitle}</p>
           <button
             onClick={() => updateSingletonRule({ ...noRecentRule, enabled: !noRecentRule.enabled })}
             className="text-amber-600 flex-shrink-0"
@@ -356,12 +354,10 @@ export default function Rules() {
             )}
           </button>
         </div>
-        <p className="text-xs text-gray-400 mb-3">
-          Ne koristi jela koja su bila u planu unutar zadnjeg N dana.
-        </p>
+        <p className="text-xs text-gray-400 mb-3">{t.rules.noRecentDesc}</p>
         {noRecentRule.enabled && (
           <div className="flex items-center gap-3">
-            <label className="text-sm text-gray-600">Zadnjih dana:</label>
+            <label className="text-sm text-gray-600">{t.rules.recentDaysLabel}</label>
             <input
               type="number"
               min={1}
@@ -379,19 +375,19 @@ export default function Rules() {
       {/* Required categories */}
       <div className="bg-white rounded-xl border p-4 mb-4">
         <div className="flex items-center justify-between mb-3">
-          <p className="font-semibold text-gray-800 text-sm">Obavezne kategorije</p>
+          <p className="font-semibold text-gray-800 text-sm">{t.rules.requiredTitle}</p>
           {!addingNew && editingId === null && (
             <button
               onClick={startAdd}
               className="flex items-center gap-1.5 text-sm bg-amber-600 text-white px-3 py-2 rounded-xl active:scale-95 transition-transform"
             >
-              <Plus size={15} /> Dodaj
+              <Plus size={15} /> {t.rules.addBtn}
             </button>
           )}
         </div>
 
         {requiredRules.length === 0 && !addingNew && (
-          <p className="text-sm text-gray-400 py-2">Nema obaveznih kategorija.</p>
+          <p className="text-sm text-gray-400 py-2">{t.rules.noRequired}</p>
         )}
 
         <div className="space-y-3">
@@ -409,17 +405,17 @@ export default function Rules() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-medium text-gray-800">{getCategoryName(rule)}</span>
                       <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
-                        {rule.categoryType === 'meal' ? 'Jelo' : 'Prilog'}
+                        {rule.categoryType === 'meal' ? t.rules.mealType : t.rules.sideType}
                       </span>
                       {!rule.enabled && (
-                        <span className="text-xs text-gray-400 italic">isključeno</span>
+                        <span className="text-xs text-gray-400 italic">{t.rules.disabled}</span>
                       )}
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
                       {rule.minCount === (rule.maxCount ?? rule.minCount)
-                        ? `Točno ${rule.minCount}×`
-                        : `${rule.minCount}–${rule.maxCount ?? rule.minCount}×`}{' '}
-                      svakih {rule.everyNDays} dana
+                        ? t.rules.timesExact(rule.minCount)
+                        : t.rules.timesRange(rule.minCount, rule.maxCount ?? rule.minCount)}{' '}
+                      {t.rules.everyNDays(rule.everyNDays)}
                     </p>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
@@ -464,22 +460,20 @@ export default function Rules() {
 
       {/* Export / Import */}
       <div className="bg-white rounded-xl border p-4">
-        <p className="font-semibold text-gray-700 mb-3 text-sm">Izvoz / Uvoz podataka</p>
+        <p className="font-semibold text-gray-700 mb-3 text-sm">{t.rules.exportImport}</p>
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={handleExport}
             className="flex items-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-sm active:scale-95 transition-transform"
           >
-            <Download size={16} /> Izvezi
+            <Download size={16} /> {t.rules.exportBtn}
           </button>
           <label className="flex items-center gap-2 px-4 py-3 border rounded-xl hover:bg-gray-50 text-sm cursor-pointer active:scale-95 transition-transform">
-            <Upload size={16} /> Uvezi
+            <Upload size={16} /> {t.rules.importBtn}
             <input type="file" accept=".json" className="hidden" onChange={handleImport} />
           </label>
         </div>
-        <p className="text-xs text-gray-400 mt-2">
-          Svi podaci se čuvaju u pregledniku. Redovito izvozite kao sigurnosnu kopiju.
-        </p>
+        <p className="text-xs text-gray-400 mt-2">{t.rules.dataNote}</p>
       </div>
     </div>
   );

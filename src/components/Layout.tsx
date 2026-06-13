@@ -1,26 +1,39 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import {
   UtensilsCrossed, Layers, Tag, ShoppingBasket, Calendar,
-  Settings, ChefHat
+  Settings, ChefHat, Globe,
 } from 'lucide-react';
-
-const links = [
-  { to: '/', label: 'Planovi', icon: Calendar, end: true },
-  { to: '/jela', label: 'Jela', icon: UtensilsCrossed },
-  { to: '/prilozi', label: 'Prilozi', icon: Layers },
-  { to: '/kategorije', label: 'Kategorije', icon: Tag },
-  { to: '/namirnice', label: 'Namirnice', icon: ShoppingBasket },
-  { to: '/pravila', label: 'Pravila', icon: Settings },
-];
+import { useLang } from '../LanguageContext';
 
 export default function Layout() {
+  const { t, lang, setLang } = useLang();
+
+  const links = [
+    { to: '/', label: t.nav.plans, icon: Calendar, end: true },
+    { to: '/jela', label: t.nav.meals, icon: UtensilsCrossed },
+    { to: '/prilozi', label: t.nav.sides, icon: Layers },
+    { to: '/kategorije', label: t.nav.categories, icon: Tag },
+    { to: '/namirnice', label: t.nav.ingredients, icon: ShoppingBasket },
+    { to: '/pravila', label: t.nav.rules, icon: Settings },
+  ];
+
+  const toggleLang = () => setLang(lang === 'hr' ? 'en' : 'hr');
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Top header */}
       <header className="bg-amber-600 text-white shadow-md print:hidden sticky top-0 z-30">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-2">
           <ChefHat size={22} />
-          <span className="text-lg font-bold tracking-tight">Planer obroka</span>
+          <span className="text-lg font-bold tracking-tight flex-1">{t.appName}</span>
+          <button
+            onClick={toggleLang}
+            title={lang === 'hr' ? 'Switch to English' : 'Prebaci na Hrvatski'}
+            className="flex items-center gap-1.5 text-sm bg-amber-700 hover:bg-amber-800 px-3 py-1.5 rounded-lg transition-colors font-medium"
+          >
+            <Globe size={15} />
+            {lang === 'hr' ? 'EN' : 'HR'}
+          </button>
         </div>
       </header>
 

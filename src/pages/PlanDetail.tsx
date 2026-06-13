@@ -5,16 +5,14 @@ import {
   RefreshCw, UtensilsCrossed, Loader2, X, CornerDownRight,
 } from 'lucide-react';
 import { useApp } from '../AppContext';
+import { useLang } from '../LanguageContext';
 import type { PlanDay, ShoppingItem, IngredientAmount } from '../types';
 import { regenerateDays } from '../planGenerator';
 
-const DAYS_HR = ['Ned', 'Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub'];
-const DAYS_FULL = ['Nedjelja', 'Ponedjeljak', 'Utorak', 'Srijeda', 'Četvrtak', 'Petak', 'Subota'];
-
-function formatDate(dateStr: string, short = false) {
+function formatDate(dateStr: string, daysFull: string[], daysShort: string[], locale: string, short = false) {
   const d = new Date(dateStr);
-  const dayName = short ? DAYS_HR[d.getDay()] : DAYS_FULL[d.getDay()];
-  return `${dayName}, ${d.toLocaleDateString('hr-HR', { day: 'numeric', month: short ? 'numeric' : 'long' })}`;
+  const dayName = short ? daysShort[d.getDay()] : daysFull[d.getDay()];
+  return `${dayName}, ${d.toLocaleDateString(locale, { day: 'numeric', month: short ? 'numeric' : 'long' })}`;
 }
 
 function buildShoppingItems(
@@ -62,11 +60,11 @@ export default function PlanDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data, setData } = useApp();
+  const { t } = useLang();
   const [tab, setTab] = useState<'plan' | 'shopping'>('plan');
   const [editDayIdx, setEditDayIdx] = useState<number | null>(null);
   const [expandedDayIdx, setExpandedDayIdx] = useState<number | null>(null);
 
-  // Regen mode state
   const [regenMode, setRegenMode] = useState(false);
   const [keptDays, setKeptDays] = useState<Set<number>>(new Set());
   const [regenLoading, setRegenLoading] = useState(false);
@@ -89,8 +87,8 @@ export default function PlanDetail() {
   if (!plan) {
     return (
       <div className="text-center py-20">
-        <p className="text-gray-400 mb-4">Plan nije pronađen.</p>
-        <Link to="/" className="text-amber-600 underline">Povratak na planove</Link>
+        <p className="text-gray-400 mb-4">{t.planDetail.notFound}</p>
+        <Link to="/" className="text-amber-600 underline">{t.planDetail.backToPlans}</Link>
       </div>
     );
   }
@@ -173,7 +171,7 @@ export default function PlanDetail() {
       try {
         const newPlan = regenerateDays(data, plan, toRegen);
         if (!newPlan) {
-          setRegenError('Nije moguće regenerirati dane. Pokušajte opet ili smanjite ograničenja.');
+          setRegenError(t.planDetail.regenModeInstruction);
           setRegenLoading(false);
           return;
         }
@@ -184,7 +182,7 @@ export default function PlanDetail() {
         setKeptDays(new Set(newPlan.days.map((_, i) => i)));
         setRegenLoading(false);
       } catch {
-        setRegenError('Greška pri regeneriranju.');
+        setRegenError(t.planDetail.regenModeInstruction);
         setRegenLoading(false);
       }
     }, 100);
@@ -208,7 +206,7 @@ export default function PlanDetail() {
         </button>
         <div className="flex-1 min-w-0">
           <h1 className="text-lg font-bold text-gray-800 truncate">{plan.name}</h1>
-          <p className="text-xs text-gray-400">{plan.days.length} dana</p>
+          <p className="text-xs text-gray-400">{t.plans.daysCount(plan.days.length)}</p>
         </div>
         <button
           onClick={() => window.print()}
@@ -226,7 +224,7 @@ export default function PlanDetail() {
             tab === 'plan' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500'
           }`}
         >
-          Plan obroka
+          {t.planDetail.tabPlan}
         </button>
         <button
           onClick={() => setTab('shopping')}
@@ -235,7 +233,7 @@ export default function PlanDetail() {
           }`}
         >
           <ShoppingCart size={15} />
-          Kupovina
+          {t.planDetail.tabShopping}
           {checkedCount + commonCheckedCount > 0 && (
             <span className="bg-amber-600 text-white text-[10px] px-1.5 py-0.5 rounded-full leading-none">
               {checkedCount + commonCheckedCount}/{totalCount}
@@ -247,15 +245,14 @@ export default function PlanDetail() {
       {/* PLAN TAB */}
       {tab === 'plan' && (
         <div>
-          {/* Regen mode toolbar */}
           {regenMode ? (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-3">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-sm font-medium text-amber-800">
-                  Odznači dane koje želiš regenerirati
+                  {t.planDetail.regenModeInstruction}
                 </p>
                 <button onClick={toggleAllRegen} className="text-xs text-amber-600 underline">
-                  {keptDays.size === plan.days.length ? 'Odznači sve' : 'Označi sve'}
+                  {keptDays.size === plan.days.length ? t.planDetail.deselectAll : t.planDetail.selectAll}
                 </button>
               </div>
               {regenError && (
@@ -268,11 +265,11 @@ export default function PlanDetail() {
                   className="flex-1 bg-amber-600 text-white py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-1.5 disabled:opacity-40 active:scale-95 transition-transform"
                 >
                   {regenLoading ? (
-                    <><Loader2 size={15} className="animate-spin" /> Generiranje...</>
+                    <><Loader2 size={15} className="animate-spin" /> {t.planDetail.regenBtnLoading}</>
                   ) : (
                     <>
                       <RefreshCw size={14} />
-                      Regeneriraj{uncheckedRegenCount > 0 && ` (${uncheckedRegenCount})`}
+                      {t.planDetail.regenBtn(uncheckedRegenCount)}
                     </>
                   )}
                 </button>
@@ -280,7 +277,7 @@ export default function PlanDetail() {
                   onClick={exitRegenMode}
                   className="flex items-center gap-1.5 px-4 py-2.5 border rounded-xl text-sm text-gray-600"
                 >
-                  <X size={14} /> Zatvori
+                  <X size={14} /> {t.planDetail.closeBtn}
                 </button>
               </div>
             </div>
@@ -290,7 +287,7 @@ export default function PlanDetail() {
                 onClick={enterRegenMode}
                 className="flex items-center gap-1.5 text-sm px-3 py-2 border rounded-xl hover:bg-gray-50 text-gray-600"
               >
-                <RefreshCw size={14} /> Regeneriraj dane
+                <RefreshCw size={14} /> {t.planDetail.regenDaysBtn}
               </button>
             </div>
           )}
@@ -316,7 +313,9 @@ export default function PlanDetail() {
                 >
                   {isEditing && !regenMode ? (
                     <div className="p-4">
-                      <p className="text-xs text-gray-400 mb-3">{formatDate(day.date)}</p>
+                      <p className="text-xs text-gray-400 mb-3">
+                        {formatDate(day.date, t.daysFull, t.daysShort, t.locale)}
+                      </p>
                       <EditDayForm
                         day={day}
                         data={data}
@@ -355,17 +354,21 @@ export default function PlanDetail() {
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-gray-400">{formatDate(day.date, true)}</p>
+                          <p className="text-xs text-gray-400">
+                            {formatDate(day.date, t.daysFull, t.daysShort, t.locale, true)}
+                          </p>
                           <div className="flex items-center gap-1.5 flex-wrap">
                             {isContinuation && (
                               <CornerDownRight size={13} className="text-amber-400 flex-shrink-0" />
                             )}
                             <p className={`font-semibold text-sm truncate ${isContinuation ? 'text-gray-500' : 'text-gray-800'}`}>
-                              {meal ? meal.name : <span className="text-red-400 italic">Nije odabrano</span>}
+                              {meal ? meal.name : <span className="text-red-400 italic">{t.planDetail.notSelected}</span>}
                               {side && <span className="text-gray-400 font-normal"> + {side.name}</span>}
                             </p>
                             {isContinuation && (
-                              <span className="text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded flex-shrink-0">nastavak</span>
+                              <span className="text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded flex-shrink-0">
+                                {t.planDetail.continuation}
+                              </span>
                             )}
                           </div>
                           {day.notes && <p className="text-xs text-gray-400 mt-0.5 truncate">{day.notes}</p>}
@@ -388,7 +391,7 @@ export default function PlanDetail() {
                           <div className="space-y-3 mt-3">
                             {meal && (
                               <div>
-                                <p className="text-xs font-semibold text-gray-500 mb-1.5">Namirnice jela:</p>
+                                <p className="text-xs font-semibold text-gray-500 mb-1.5">{t.planDetail.mealIngredients}</p>
                                 <ul className="text-sm text-gray-600 space-y-1">
                                   {meal.ingredients.map((ing, i) => (
                                     <li key={i} className="flex justify-between">
@@ -399,7 +402,7 @@ export default function PlanDetail() {
                                 </ul>
                                 {meal.recipe && (
                                   <details className="mt-2">
-                                    <summary className="text-xs font-semibold text-amber-600 cursor-pointer">Recept</summary>
+                                    <summary className="text-xs font-semibold text-amber-600 cursor-pointer">{t.planDetail.recipe}</summary>
                                     <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{meal.recipe}</p>
                                   </details>
                                 )}
@@ -407,7 +410,7 @@ export default function PlanDetail() {
                             )}
                             {side && side.ingredients.length > 0 && (
                               <div>
-                                <p className="text-xs font-semibold text-gray-500 mb-1.5">Namirnice priloga:</p>
+                                <p className="text-xs font-semibold text-gray-500 mb-1.5">{t.planDetail.sideIngredients}</p>
                                 <ul className="text-sm text-gray-600 space-y-1">
                                   {side.ingredients.map((ing, i) => (
                                     <li key={i} className="flex justify-between">
@@ -434,12 +437,12 @@ export default function PlanDetail() {
       {tab === 'shopping' && (
         <div>
           <div className="flex items-center justify-between mb-3 print:hidden">
-            <p className="text-sm text-gray-500">Označite što trebate kupiti</p>
+            <p className="text-sm text-gray-500">{t.planDetail.shoppingInstruction}</p>
             <button
               onClick={rebuildShopping}
               className="flex items-center gap-1.5 text-sm px-3 py-2 border rounded-xl hover:bg-gray-50"
             >
-              <RefreshCw size={14} /> Osvježi
+              <RefreshCw size={14} /> {t.planDetail.refreshBtn}
             </button>
           </div>
 
@@ -447,10 +450,10 @@ export default function PlanDetail() {
           <div className="bg-white rounded-xl border overflow-hidden mb-3">
             <div className="bg-amber-50 px-4 py-3 border-b">
               <p className="font-semibold text-amber-800 text-sm">
-                Namirnice za plan
+                {t.planDetail.planIngredients}
                 {shopping && shopping.items.length > 0 && (
                   <span className="ml-2 text-amber-600 font-normal text-xs">
-                    {checkedCount}/{shopping.items.length} označeno
+                    {t.planDetail.markedLabel(checkedCount, shopping.items.length)}
                   </span>
                 )}
               </p>
@@ -458,8 +461,8 @@ export default function PlanDetail() {
             {!shopping || shopping.items.length === 0 ? (
               <div className="text-center py-8 text-sm text-gray-400">
                 <UtensilsCrossed size={28} className="mx-auto mb-2 opacity-30" />
-                <p>Nema namirnica</p>
-                <p className="text-xs">Dodajte namirnice jelima i prilozima</p>
+                <p>{t.planDetail.noIngredients}</p>
+                <p className="text-xs">{t.planDetail.noIngredientsNote}</p>
               </div>
             ) : (
               <ul>
@@ -492,9 +495,9 @@ export default function PlanDetail() {
           <div className="bg-white rounded-xl border overflow-hidden">
             <div className="bg-yellow-50 px-4 py-3 border-b">
               <p className="font-semibold text-yellow-800 text-sm">
-                ⭐ Stalne namirnice
+                {t.planDetail.commonIngredients}
                 <span className="ml-2 text-yellow-600 font-normal text-xs">
-                  {commonCheckedCount}/{data.ingredients.filter((i) => i.isCommon).length} označeno
+                  {t.planDetail.markedLabel(commonCheckedCount, data.ingredients.filter((i) => i.isCommon).length)}
                 </span>
               </p>
             </div>
@@ -537,6 +540,7 @@ function EditDayForm({
   onSave: (d: PlanDay) => void;
   onCancel: () => void;
 }) {
+  const { t } = useLang();
   const [mealId, setMealId] = useState(day.mealId);
   const [sideId, setSideId] = useState(day.sideId);
   const [notes, setNotes] = useState(day.notes);
@@ -553,7 +557,7 @@ function EditDayForm({
         value={mealId}
         onChange={(e) => { setMealId(e.target.value); setSideId(''); }}
       >
-        <option value="">-- Odaberi jelo --</option>
+        <option value="">{t.planDetail.selectMeal}</option>
         {data.meals.map((m) => (
           <option key={m.id} value={m.id}>{m.name}</option>
         ))}
@@ -563,14 +567,14 @@ function EditDayForm({
         value={sideId}
         onChange={(e) => setSideId(e.target.value)}
       >
-        <option value="">-- Bez priloga --</option>
+        <option value="">{t.planDetail.noSide}</option>
         {availableSides.map((s) => (
           <option key={s.id} value={s.id}>{s.name}</option>
         ))}
       </select>
       <input
         className="w-full border rounded-xl px-4 py-3 text-sm"
-        placeholder="Bilješka (neobavezno)"
+        placeholder={t.planDetail.notesPlaceholder}
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
       />
@@ -579,10 +583,10 @@ function EditDayForm({
           onClick={() => onSave({ ...day, mealId, sideId, notes })}
           className="flex-1 bg-amber-600 text-white py-3 rounded-xl text-sm font-medium"
         >
-          Spremi
+          {t.planDetail.saveBtn}
         </button>
         <button onClick={onCancel} className="flex-1 border py-3 rounded-xl text-sm font-medium text-gray-600">
-          Odustani
+          {t.planDetail.cancelBtn}
         </button>
       </div>
     </div>
