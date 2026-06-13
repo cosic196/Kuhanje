@@ -53,7 +53,6 @@ function CategorySection({
                   if (e.key === 'Enter') commitEdit();
                   if (e.key === 'Escape') setEditId(null);
                 }}
-                autoFocus
               />
               <button onClick={commitEdit} className="p-2.5 bg-amber-600 text-white rounded-xl">
                 <Check size={16} />

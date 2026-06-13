@@ -203,7 +203,6 @@ export default function Sides() {
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder="Npr. Tjestenina"
-                autoFocus
               />
             </div>
             <div>
@@ -236,7 +235,6 @@ export default function Sides() {
                     value={newCatName}
                     onChange={(e) => setNewCatName(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') createCategory(); if (e.key === 'Escape') { setShowNewCat(false); setNewCatName(''); } }}
-                    autoFocus
                   />
                   <button
                     type="button"

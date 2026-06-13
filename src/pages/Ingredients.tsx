@@ -65,7 +65,6 @@ export default function Ingredients() {
                   className="flex-1 border rounded-xl px-3 py-2.5 text-sm bg-white"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  autoFocus
                   onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditId(null); }}
                 />
                 <label className="flex items-center gap-1 text-xs text-gray-600 whitespace-nowrap flex-shrink-0">

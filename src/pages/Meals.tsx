@@ -294,7 +294,6 @@ export default function Meals() {
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder="Npr. Grah s kobasicom"
-                autoFocus
               />
             </div>
 
@@ -328,7 +327,6 @@ export default function Meals() {
                     value={newCatName}
                     onChange={(e) => setNewCatName(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') createCategory(); if (e.key === 'Escape') { setShowNewCat(false); setNewCatName(''); } }}
-                    autoFocus
                   />
                   <button
                     type="button"
@@ -386,7 +384,6 @@ export default function Meals() {
                     value={newSideName}
                     onChange={(e) => setNewSideName(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') createSide(); if (e.key === 'Escape') { setShowNewSide(false); setNewSideName(''); } }}
-                    autoFocus
                   />
                   <div className="flex gap-2">
                     <select
@@ -416,7 +413,6 @@ export default function Meals() {
                         value={newSideCatName}
                         onChange={(e) => setNewSideCatName(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter') createSideCategory(); if (e.key === 'Escape') { setShowNewSideCat(false); setNewSideCatName(''); } }}
-                        autoFocus
                       />
                       <button
                         type="button"
