@@ -120,7 +120,7 @@ export default function Rules() {
               value={form.categoryType}
               onChange={(e) => setForm({ ...form, categoryType: e.target.value as 'meal' | 'side', categoryId: '' })}>
               <option value="meal">Jelo</option>
-              <option value="side">Dodatak</option>
+              <option value="side">Prilog</option>
             </select>
           </div>
           <div>
@@ -196,13 +196,13 @@ export default function Rules() {
       {/* No repeat side category rule */}
       <div className={`bg-white rounded-xl border p-4 mb-3 ${!noRepeatRule.enabled ? 'opacity-60' : ''}`}>
         <div className="flex items-center justify-between mb-1">
-          <p className="font-semibold text-gray-800 text-sm">Ne ponavljaj vrstu dodatka</p>
+          <p className="font-semibold text-gray-800 text-sm">Ne ponavljaj vrstu priloga</p>
           <button onClick={() => updateSingletonRule({ ...noRepeatRule, enabled: !noRepeatRule.enabled })}
             className="text-amber-600 flex-shrink-0">
             {noRepeatRule.enabled ? <ToggleRight size={28} /> : <ToggleLeft size={28} className="text-gray-300" />}
           </button>
         </div>
-        <p className="text-xs text-gray-400 mb-3">Ista kategorija dodatka ne smije se pojaviti unutar N uzastopnih dana.</p>
+        <p className="text-xs text-gray-400 mb-3">Ista kategorija priloga ne smije se pojaviti unutar N uzastopnih dana.</p>
         {noRepeatRule.enabled && (
           <div className="flex items-center gap-3">
             <label className="text-sm text-gray-600">Prozor dana:</label>
@@ -260,7 +260,7 @@ export default function Rules() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-medium text-gray-800">{getCategoryName(rule)}</span>
                       <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
-                        {rule.categoryType === 'meal' ? 'Jelo' : 'Dodatak'}
+                        {rule.categoryType === 'meal' ? 'Jelo' : 'Prilog'}
                       </span>
                       {!rule.enabled && <span className="text-xs text-gray-400 italic">isključeno</span>}
                     </div>

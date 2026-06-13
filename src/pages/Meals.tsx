@@ -25,10 +25,12 @@ export default function Meals() {
   const [showNewCat, setShowNewCat] = useState(false);
   const [newCatName, setNewCatName] = useState('');
 
-  // inline side creation
+  // inline prilog creation
   const [showNewSide, setShowNewSide] = useState(false);
   const [newSideName, setNewSideName] = useState('');
   const [newSideCatId, setNewSideCatId] = useState('sc_ostalo');
+  const [showNewSideCat, setShowNewSideCat] = useState(false);
+  const [newSideCatName, setNewSideCatName] = useState('');
 
   const sortedMeals = [...data.meals].sort((a, b) => a.name.localeCompare(b.name, 'hr'));
   const filtered = sortedMeals.filter((m) =>
@@ -44,6 +46,8 @@ export default function Meals() {
     setShowNewSide(false);
     setNewSideName('');
     setNewSideCatId('sc_ostalo');
+    setShowNewSideCat(false);
+    setNewSideCatName('');
   };
 
   const openNew = () => { setForm(empty()); setEditing(null); setIsNew(true); resetInline(); };
@@ -100,6 +104,20 @@ export default function Meals() {
     setForm((f) => ({ ...f, possibleSideIds: [...f.possibleSideIds, id] }));
     setNewSideName('');
     setShowNewSide(false);
+    setShowNewSideCat(false);
+    setNewSideCatName('');
+  };
+
+  const createSideCategory = () => {
+    if (!newSideCatName.trim()) return;
+    const id = generateId('sc');
+    setData((prev) => ({
+      ...prev,
+      sideCategories: [...prev.sideCategories, { id, name: newSideCatName.trim() }],
+    }));
+    setNewSideCatId(id);
+    setNewSideCatName('');
+    setShowNewSideCat(false);
   };
 
   const getCategoryName = (id: string) =>
@@ -148,7 +166,7 @@ export default function Meals() {
                       <span className="text-xs text-gray-400">{m.ingredients.length} nam.</span>
                     )}
                     {m.possibleSideIds.length > 0 && (
-                      <span className="text-xs text-gray-400">{m.possibleSideIds.length} dod.</span>
+                      <span className="text-xs text-gray-400">{m.possibleSideIds.length} pril.</span>
                     )}
                   </div>
                 </div>
@@ -240,7 +258,7 @@ export default function Meals() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Mogući dodaci</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Mogući prilozi</label>
               {sortedSides.length > 0 && (
                 <div className="grid grid-cols-2 gap-2 max-h-44 overflow-y-auto border rounded-xl p-3 mb-2">
                   {sortedSides.map((side) => (
@@ -257,28 +275,66 @@ export default function Meals() {
                 </div>
               )}
               {sortedSides.length === 0 && !showNewSide && (
-                <p className="text-sm text-gray-400 mb-2">Nema dodanih dodataka.</p>
+                <p className="text-sm text-gray-400 mb-2">Nema dodanih priloga.</p>
               )}
               {showNewSide ? (
                 <div className="border rounded-xl p-3 bg-amber-50 space-y-2">
-                  <p className="text-xs font-semibold text-gray-600">Novi dodatak</p>
+                  <p className="text-xs font-semibold text-gray-600">Novi prilog</p>
                   <input
                     className="w-full border rounded-xl px-3 py-2.5 text-sm bg-white"
-                    placeholder="Naziv dodatka (npr. Tjestenina)..."
+                    placeholder="Naziv priloga (npr. Tjestenina)..."
                     value={newSideName}
                     onChange={(e) => setNewSideName(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') createSide(); if (e.key === 'Escape') { setShowNewSide(false); setNewSideName(''); } }}
                     autoFocus
                   />
-                  <select
-                    className="w-full border rounded-xl px-3 py-2.5 text-sm bg-white"
-                    value={newSideCatId}
-                    onChange={(e) => setNewSideCatId(e.target.value)}
-                  >
-                    {sortedSideCategories.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
+                  <div className="flex gap-2">
+                    <select
+                      className="flex-1 border rounded-xl px-3 py-2.5 text-sm bg-white"
+                      value={newSideCatId}
+                      onChange={(e) => setNewSideCatId(e.target.value)}
+                    >
+                      {sortedSideCategories.map((c) => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+                    {!showNewSideCat && (
+                      <button
+                        type="button"
+                        onClick={() => setShowNewSideCat(true)}
+                        className="px-3 py-2.5 border rounded-xl text-amber-600 hover:bg-amber-50 text-sm font-medium flex items-center gap-1 flex-shrink-0 bg-white"
+                      >
+                        <Plus size={14} /> Nova
+                      </button>
+                    )}
+                  </div>
+                  {showNewSideCat && (
+                    <div className="flex gap-2">
+                      <input
+                        className="flex-1 border rounded-xl px-3 py-2.5 text-sm bg-white"
+                        placeholder="Naziv kategorije..."
+                        value={newSideCatName}
+                        onChange={(e) => setNewSideCatName(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') createSideCategory(); if (e.key === 'Escape') { setShowNewSideCat(false); setNewSideCatName(''); } }}
+                        autoFocus
+                      />
+                      <button
+                        type="button"
+                        onClick={createSideCategory}
+                        disabled={!newSideCatName.trim()}
+                        className="p-2.5 bg-amber-600 text-white rounded-xl disabled:opacity-40 flex-shrink-0"
+                      >
+                        <Check size={16} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setShowNewSideCat(false); setNewSideCatName(''); }}
+                        className="p-2.5 border rounded-xl text-gray-500 flex-shrink-0 bg-white"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  )}
                   <div className="flex gap-2">
                     <button
                       type="button"
@@ -290,7 +346,7 @@ export default function Meals() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => { setShowNewSide(false); setNewSideName(''); }}
+                      onClick={() => { setShowNewSide(false); setNewSideName(''); setShowNewSideCat(false); setNewSideCatName(''); }}
                       className="px-4 border rounded-xl text-gray-600 text-sm"
                     >
                       Otkaži
@@ -303,7 +359,7 @@ export default function Meals() {
                   onClick={() => setShowNewSide(true)}
                   className="flex items-center gap-1.5 text-sm text-amber-600 hover:text-amber-800 py-1"
                 >
-                  <Plus size={14} /> Dodaj novi dodatak
+                  <Plus size={14} /> Dodaj novi prilog
                 </button>
               )}
             </div>

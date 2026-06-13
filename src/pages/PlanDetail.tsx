@@ -259,7 +259,7 @@ export default function PlanDetail() {
                           )}
                           {side && side.ingredients.length > 0 && (
                             <div>
-                              <p className="text-xs font-semibold text-gray-500 mb-1.5">Namirnice dodatka:</p>
+                              <p className="text-xs font-semibold text-gray-500 mb-1.5">Namirnice priloga:</p>
                               <ul className="text-sm text-gray-600 space-y-1">
                                 {side.ingredients.map((ing, i) => (
                                   <li key={i} className="flex justify-between">
@@ -312,7 +312,7 @@ export default function PlanDetail() {
               <div className="text-center py-8 text-sm text-gray-400">
                 <UtensilsCrossed size={28} className="mx-auto mb-2 opacity-30" />
                 <p>Nema namirnica</p>
-                <p className="text-xs">Dodajte namirnice jelima i dodacima</p>
+                <p className="text-xs">Dodajte namirnice jelima i prilozima</p>
               </div>
             ) : (
               <ul>
@@ -416,7 +416,7 @@ function EditDayForm({
         value={sideId}
         onChange={(e) => setSideId(e.target.value)}
       >
-        <option value="">-- Bez dodatka --</option>
+        <option value="">-- Bez priloga --</option>
         {availableSides.map((s) => (
           <option key={s.id} value={s.id}>{s.name}</option>
         ))}

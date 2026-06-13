@@ -136,7 +136,7 @@ export default function Categories() {
           badgeClass="text-amber-700 bg-amber-50"
         />
         <CategorySection
-          title="Kategorije dodataka"
+          title="Kategorije priloga"
           items={[...data.sideCategories].sort((a, b) => a.name.localeCompare(b.name, 'hr'))}
           onAdd={addSideCat}
           onEdit={editSideCat}

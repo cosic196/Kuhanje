@@ -18,7 +18,7 @@ export default function App() {
             <Route index element={<Plans />} />
             <Route path="plan/:id" element={<PlanDetail />} />
             <Route path="jela" element={<Meals />} />
-            <Route path="dodaci" element={<Sides />} />
+            <Route path="prilozi" element={<Sides />} />
             <Route path="kategorije" element={<Categories />} />
             <Route path="namirnice" element={<Ingredients />} />
             <Route path="pravila" element={<Rules />} />

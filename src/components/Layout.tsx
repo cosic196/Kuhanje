@@ -7,7 +7,7 @@ import {
 const links = [
   { to: '/', label: 'Planovi', icon: Calendar, end: true },
   { to: '/jela', label: 'Jela', icon: UtensilsCrossed },
-  { to: '/dodaci', label: 'Dodaci', icon: Layers },
+  { to: '/prilozi', label: 'Prilozi', icon: Layers },
   { to: '/kategorije', label: 'Kategorije', icon: Tag },
   { to: '/namirnice', label: 'Namirnice', icon: ShoppingBasket },
   { to: '/pravila', label: 'Pravila', icon: Settings },
