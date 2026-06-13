@@ -76,6 +76,34 @@ function getRecentMealCategories(
   return cats;
 }
 
+// Returns true if placing a meal with categoryId on dayIndex would exceed the
+// required_category rule's maxCount for that day's window.
+function isRequiredCategoryMaxed(
+  dayIndex: number,
+  categoryId: string,
+  requiredRules: RequiredCategoryRule[],
+  days: PlanDay[],
+  meals: Meal[],
+  numDays: number
+): boolean {
+  for (const rule of requiredRules) {
+    if (rule.categoryType !== 'meal' || rule.categoryId !== categoryId) continue;
+    const maxCount = rule.maxCount ?? rule.minCount;
+    const w = Math.floor(dayIndex / rule.everyNDays);
+    const wStart = w * rule.everyNDays;
+    const wEnd = Math.min((w + 1) * rule.everyNDays, numDays);
+    let count = 0;
+    for (let d = wStart; d < wEnd; d++) {
+      // Skip continuation days — they are part of the same meal instance
+      if (!days[d]?.mealId || days[d]?.isSpanContinuation) continue;
+      const m = meals.find((mm) => mm.id === days[d].mealId);
+      if (m?.categoryId === categoryId) count++;
+    }
+    if (count >= maxCount) return true;
+  }
+  return false;
+}
+
 function buildDays(
   data: AppData,
   numDays: number,
@@ -190,15 +218,41 @@ function buildDays(
           ? getRecentMealCategories(days, meals, di, noRepeatMealCatRule.windowDays)
           : new Set<string>();
 
+      // Bug fix: exclude meals from required categories that have already hit maxCount
       const basePool = meals.filter(
-        (m) => !recentMealIds.has(m.id) && !usedMealIds.has(m.id)
+        (m) =>
+          !recentMealIds.has(m.id) &&
+          !usedMealIds.has(m.id) &&
+          !isRequiredCategoryMaxed(di, m.categoryId, requiredRules, days, meals, numDays)
       );
       const filtered = noRepeatMealCatRule?.enabled
         ? basePool.filter((m) => !recentCats.has(m.categoryId))
         : basePool;
 
       // Fall back to unfiltered if no meals satisfy the category-repeat rule
-      const meal = shuffle(filtered.length > 0 ? filtered : basePool)[0];
+      const candidatePool = filtered.length > 0 ? filtered : basePool;
+
+      // Bug fix: prefer meals that have at least one side not violating the
+      // no-repeat side constraint, so the side fallback path is avoided
+      let sideFilteredPool = candidatePool;
+      if (noRepeatSideRule?.enabled) {
+        const recentSideCats = new Set<string>();
+        for (let i = Math.max(0, di - (noRepeatSideRule.windowDays - 1)); i < di; i++) {
+          const cat = getSideCategoryForDay(days, sides, i);
+          if (cat) recentSideCats.add(cat);
+        }
+        if (recentSideCats.size > 0) {
+          const withValidSide = candidatePool.filter((m) => {
+            if (m.possibleSideIds.length === 0) return true;
+            return sides
+              .filter((s) => m.possibleSideIds.includes(s.id))
+              .some((s) => !recentSideCats.has(s.categoryId));
+          });
+          if (withValidSide.length > 0) sideFilteredPool = withValidSide;
+        }
+      }
+
+      const meal = shuffle(sideFilteredPool)[0];
 
       if (!meal) {
         success = false;
