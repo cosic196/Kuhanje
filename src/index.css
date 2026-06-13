@@ -2,12 +2,30 @@
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   margin: 0;
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+/* Safe area for notched phones */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Ensure inputs are not zoomed on iOS */
+input, select, textarea {
+  font-size: 16px;
+}
+
+@media (min-width: 640px) {
+  input, select, textarea {
+    font-size: 14px;
+  }
 }
 
 @media print {
@@ -17,24 +35,7 @@ body {
 
   body {
     background: white;
-    font-size: 12px;
-  }
-
-  .bg-amber-50,
-  .bg-amber-100,
-  .bg-amber-600,
-  .bg-white {
-    background: white !important;
-  }
-
-  .shadow-sm,
-  .shadow-md,
-  .shadow-2xl {
-    box-shadow: none !important;
-  }
-
-  .rounded-xl {
-    border-radius: 0 !important;
+    font-size: 11px;
   }
 
   * {

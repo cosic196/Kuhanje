@@ -1,9 +1,8 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import {
   UtensilsCrossed, Layers, Tag, ShoppingBasket, Calendar,
-  Settings, Menu, X, ChefHat
+  Settings, ChefHat
 } from 'lucide-react';
-import { useState } from 'react';
 
 const links = [
   { to: '/', label: 'Planovi', icon: Calendar, end: true },
@@ -15,62 +14,77 @@ const links = [
 ];
 
 export default function Layout() {
-  const [open, setOpen] = useState(false);
-
   return (
-    <div className="min-h-screen bg-amber-50 flex flex-col">
-      <header className="bg-amber-600 text-white shadow-md print:hidden">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-3">
-          <ChefHat size={24} />
-          <span className="text-xl font-bold tracking-tight flex-1">Planer obroka</span>
-          <button
-            className="md:hidden p-1 rounded hover:bg-amber-700"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <X size={22} /> : <Menu size={22} />}
-          </button>
-          <nav className="hidden md:flex gap-1">
-            {links.map(({ to, label, icon: Icon, end }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={end}
-                className={({ isActive }) =>
-                  `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    isActive ? 'bg-white text-amber-700' : 'hover:bg-amber-700 text-white'
-                  }`
-                }
-              >
-                <Icon size={16} />
-                {label}
-              </NavLink>
-            ))}
-          </nav>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Top header */}
+      <header className="bg-amber-600 text-white shadow-md print:hidden sticky top-0 z-30">
+        <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-2">
+          <ChefHat size={22} />
+          <span className="text-lg font-bold tracking-tight">Planer obroka</span>
         </div>
-        {open && (
-          <nav className="md:hidden flex flex-col border-t border-amber-500">
-            {links.map(({ to, label, icon: Icon, end }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={end}
-                onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
-                    isActive ? 'bg-amber-800' : 'hover:bg-amber-700'
-                  }`
-                }
-              >
-                <Icon size={16} />
-                {label}
-              </NavLink>
-            ))}
-          </nav>
-        )}
       </header>
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-6">
+
+      {/* Main content - bottom padding accounts for mobile nav bar */}
+      <main className="flex-1 max-w-3xl mx-auto w-full px-3 py-4 pb-24 md:pb-6">
         <Outlet />
       </main>
+
+      {/* Bottom nav — mobile only */}
+      <nav className="fixed bottom-0 inset-x-0 bg-white border-t shadow-lg print:hidden md:hidden z-40">
+        <div className="grid grid-cols-6 h-16 safe-area-pb">
+          {links.map(({ to, label, icon: Icon, end }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={end}
+              className={({ isActive }) =>
+                `flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors pt-1 ${
+                  isActive ? 'text-amber-600' : 'text-gray-400'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <div className={`p-1 rounded-lg transition-colors ${isActive ? 'bg-amber-50' : ''}`}>
+                    <Icon size={20} />
+                  </div>
+                  <span className="leading-none">{label}</span>
+                </>
+              )}
+            </NavLink>
+          ))}
+        </div>
+      </nav>
+
+      {/* Desktop sidebar nav */}
+      <div className="hidden md:block fixed left-0 top-14 bottom-0 w-52 bg-white border-r shadow-sm print:hidden">
+        <nav className="flex flex-col gap-1 p-3">
+          {links.map(({ to, label, icon: Icon, end }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={end}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-amber-50 text-amber-700'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`
+              }
+            >
+              <Icon size={18} />
+              {label}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
+
+      {/* Desktop content offset for sidebar */}
+      <style>{`
+        @media (min-width: 768px) {
+          main { margin-left: 13rem; }
+        }
+      `}</style>
     </div>
   );
 }

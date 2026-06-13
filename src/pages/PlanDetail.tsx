@@ -1,17 +1,19 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft, Printer, ShoppingCart, Pencil, Check, ChevronDown, ChevronUp,
-  RefreshCw
+  RefreshCw, UtensilsCrossed
 } from 'lucide-react';
 import { useApp } from '../AppContext';
 import type { PlanDay, ShoppingItem, IngredientAmount } from '../types';
 
-const DAYS_HR = ['Nedjelja', 'Ponedjeljak', 'Utorak', 'Srijeda', 'Četvrtak', 'Petak', 'Subota'];
+const DAYS_HR = ['Ned', 'Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub'];
+const DAYS_FULL = ['Nedjelja', 'Ponedjeljak', 'Utorak', 'Srijeda', 'Četvrtak', 'Petak', 'Subota'];
 
-function formatDate(dateStr: string) {
+function formatDate(dateStr: string, short = false) {
   const d = new Date(dateStr);
-  return `${DAYS_HR[d.getDay()]}, ${d.toLocaleDateString('hr-HR', { day: 'numeric', month: 'long' })}`;
+  const dayName = short ? DAYS_HR[d.getDay()] : DAYS_FULL[d.getDay()];
+  return `${dayName}, ${d.toLocaleDateString('hr-HR', { day: 'numeric', month: short ? 'numeric' : 'long' })}`;
 }
 
 function buildShoppingItems(
@@ -25,13 +27,10 @@ function buildShoppingItems(
       if (!item.ingredientId) continue;
       const ing = data.ingredients.find((i) => i.id === item.ingredientId);
       if (!ing || ing.isCommon) continue;
-
       const numAmount = parseFloat(item.amount) || 0;
       if (map.has(item.ingredientId)) {
         const existing = map.get(item.ingredientId)!;
-        if (existing.unit === item.unit) {
-          existing.amount += numAmount;
-        }
+        if (existing.unit === item.unit) existing.amount += numAmount;
       } else {
         map.set(item.ingredientId, { amount: numAmount, unit: item.unit, ingredientId: item.ingredientId });
       }
@@ -64,7 +63,6 @@ export default function PlanDetail() {
   const [tab, setTab] = useState<'plan' | 'shopping'>('plan');
   const [editDayIdx, setEditDayIdx] = useState<number | null>(null);
   const [expandedDayIdx, setExpandedDayIdx] = useState<number | null>(null);
-  const printRef = useRef<HTMLDivElement>(null);
 
   const plan = data.plans.find((p) => p.id === id);
 
@@ -82,7 +80,7 @@ export default function PlanDetail() {
 
   if (!plan) {
     return (
-      <div className="text-center py-16">
+      <div className="text-center py-20">
         <p className="text-gray-400 mb-4">Plan nije pronađen.</p>
         <Link to="/" className="text-amber-600 underline">Povratak na planove</Link>
       </div>
@@ -132,52 +130,64 @@ export default function PlanDetail() {
     }));
   };
 
-  const getMeal = (id: string) => data.meals.find((m) => m.id === id);
-  const getSide = (id: string) => data.sides.find((s) => s.id === id);
-  const getIngredientName = (id: string) => data.ingredients.find((i) => i.id === id)?.name ?? id;
+  const getMeal = (mealId: string) => data.meals.find((m) => m.id === mealId);
+  const getSide = (sideId: string) => data.sides.find((s) => s.id === sideId);
+  const getIngredientName = (ingId: string) => data.ingredients.find((i) => i.id === ingId)?.name ?? ingId;
 
-  const handlePrint = () => window.print();
+  const checkedCount = shopping?.items.filter((i) => i.checked).length ?? 0;
+  const totalCount = (shopping?.items.length ?? 0) + data.ingredients.filter(i => i.isCommon).length;
+  const commonCheckedCount = Object.values(shopping?.commonChecked ?? {}).filter(Boolean).length;
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-6 print:hidden">
-        <button onClick={() => navigate('/')} className="p-2 rounded-lg hover:bg-gray-100 text-gray-600">
-          <ArrowLeft size={20} />
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-4 print:hidden">
+        <button onClick={() => navigate('/')} className="p-2 rounded-xl hover:bg-gray-100 text-gray-600 -ml-1">
+          <ArrowLeft size={22} />
         </button>
-        <h1 className="text-xl font-bold text-gray-800 flex-1">{plan.name}</h1>
-        <div className="flex gap-2">
-          <button
-            onClick={handlePrint}
-            className="flex items-center gap-1.5 px-3 py-1.5 border rounded-lg hover:bg-gray-50 text-sm"
-          >
-            <Printer size={16} /> Ispis
-          </button>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-lg font-bold text-gray-800 truncate">{plan.name}</h1>
+          <p className="text-xs text-gray-400">{plan.days.length} dana</p>
         </div>
+        <button
+          onClick={() => window.print()}
+          className="p-2.5 border rounded-xl hover:bg-gray-50 text-gray-600"
+        >
+          <Printer size={19} />
+        </button>
       </div>
 
-      <div className="flex gap-1 mb-6 print:hidden">
+      {/* Tabs */}
+      <div className="flex gap-1.5 mb-4 print:hidden bg-gray-100 p-1 rounded-xl">
         <button
           onClick={() => setTab('plan')}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'plan' ? 'bg-amber-600 text-white' : 'border hover:bg-gray-50'}`}
+          className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+            tab === 'plan' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500'
+          }`}
         >
           Plan obroka
         </button>
         <button
           onClick={() => setTab('shopping')}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1.5 ${tab === 'shopping' ? 'bg-amber-600 text-white' : 'border hover:bg-gray-50'}`}
+          className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1.5 ${
+            tab === 'shopping' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500'
+          }`}
         >
-          <ShoppingCart size={16} /> Lista za kupovinu
+          <ShoppingCart size={15} />
+          Kupovina
+          {checkedCount + commonCheckedCount > 0 && (
+            <span className="bg-amber-600 text-white text-[10px] px-1.5 py-0.5 rounded-full leading-none">
+              {checkedCount + commonCheckedCount}/{totalCount}
+            </span>
+          )}
         </button>
       </div>
 
       {/* PLAN TAB */}
       {tab === 'plan' && (
-        <div className="space-y-2 print:space-y-4" ref={printRef}>
+        <div className="space-y-2">
           <div className="print:block hidden mb-4">
             <h1 className="text-2xl font-bold">{plan.name}</h1>
-            <p className="text-gray-500 text-sm">
-              {new Date(plan.startDate).toLocaleDateString('hr-HR')} – {new Date(plan.days[plan.days.length-1]?.date ?? plan.startDate).toLocaleDateString('hr-HR')}
-            </p>
           </div>
           {plan.days.map((day, idx) => {
             const meal = getMeal(day.mealId);
@@ -186,86 +196,84 @@ export default function PlanDetail() {
             const isExpanded = expandedDayIdx === idx;
 
             return (
-              <div key={idx} className="bg-white rounded-xl border print:border-b print:rounded-none print:shadow-none shadow-sm">
-                <div className="flex items-center gap-3 p-3 print:py-2">
-                  <div className="bg-amber-100 text-amber-700 rounded-lg px-2 py-1 text-xs font-bold min-w-[2.5rem] text-center print:bg-transparent print:text-gray-600">
-                    {idx + 1}
+              <div key={idx} className="bg-white rounded-xl border overflow-hidden print:border-b print:rounded-none print:shadow-none">
+                {isEditing ? (
+                  <div className="p-4">
+                    <p className="text-xs text-gray-400 mb-3">{formatDate(day.date)}</p>
+                    <EditDayForm
+                      day={day}
+                      data={data}
+                      onSave={(d) => { updateDay(idx, d); setEditDayIdx(null); }}
+                      onCancel={() => setEditDayIdx(null)}
+                    />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs text-gray-500">{formatDate(day.date)}</div>
-                    {isEditing ? (
-                      <EditDayForm
-                        day={day}
-                        data={data}
-                        onSave={(d) => { updateDay(idx, d); setEditDayIdx(null); }}
-                        onCancel={() => setEditDayIdx(null)}
-                      />
-                    ) : (
-                      <div>
-                        <span className="font-semibold text-gray-800">
-                          {meal ? meal.name : <span className="text-red-400 italic">Nije odabrano jelo</span>}
-                        </span>
-                        {side && <span className="text-gray-500"> + {side.name}</span>}
-                        {day.notes && <p className="text-xs text-gray-400 mt-0.5">{day.notes}</p>}
+                ) : (
+                  <>
+                    <button
+                      className="w-full flex items-center gap-3 p-4 text-left active:bg-gray-50"
+                      onClick={() => setExpandedDayIdx(isExpanded ? null : idx)}
+                    >
+                      <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-xs font-bold text-amber-700">
+                        {idx + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-400">{formatDate(day.date, true)}</p>
+                        <p className="font-semibold text-gray-800 text-sm truncate">
+                          {meal ? meal.name : <span className="text-red-400 italic">Nije odabrano</span>}
+                          {side && <span className="text-gray-400 font-normal"> + {side.name}</span>}
+                        </p>
+                        {day.notes && <p className="text-xs text-gray-400 mt-0.5 truncate">{day.notes}</p>}
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0 print:hidden">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setEditDayIdx(idx); setExpandedDayIdx(null); }}
+                          className="p-2 text-gray-300 hover:text-amber-600 rounded-lg"
+                        >
+                          <Pencil size={16} />
+                        </button>
+                        {isExpanded ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-300" />}
+                      </div>
+                    </button>
+
+                    {isExpanded && (
+                      <div className="px-4 pb-4 border-t bg-gray-50">
+                        <div className="space-y-3 mt-3">
+                          {meal && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-500 mb-1.5">Sastojci jela:</p>
+                              <ul className="text-sm text-gray-600 space-y-1">
+                                {meal.ingredients.map((ing, i) => (
+                                  <li key={i} className="flex justify-between">
+                                    <span>{getIngredientName(ing.ingredientId)}</span>
+                                    <span className="text-gray-400">{ing.amount} {ing.unit}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                              {meal.recipe && (
+                                <details className="mt-2">
+                                  <summary className="text-xs font-semibold text-amber-600 cursor-pointer">Recept</summary>
+                                  <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{meal.recipe}</p>
+                                </details>
+                              )}
+                            </div>
+                          )}
+                          {side && side.ingredients.length > 0 && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-500 mb-1.5">Sastojci dodatka:</p>
+                              <ul className="text-sm text-gray-600 space-y-1">
+                                {side.ingredients.map((ing, i) => (
+                                  <li key={i} className="flex justify-between">
+                                    <span>{getIngredientName(ing.ingredientId)}</span>
+                                    <span className="text-gray-400">{ing.amount} {ing.unit}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
-                  </div>
-                  {!isEditing && (
-                    <div className="flex gap-1 print:hidden flex-shrink-0">
-                      <button
-                        onClick={() => setExpandedDayIdx(isExpanded ? null : idx)}
-                        className="p-1.5 text-gray-400 hover:text-gray-600 rounded"
-                        title="Detalji"
-                      >
-                        {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                      </button>
-                      <button
-                        onClick={() => setEditDayIdx(idx)}
-                        className="p-1.5 text-gray-400 hover:text-amber-600 rounded"
-                        title="Uredi"
-                      >
-                        <Pencil size={15} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-                {isExpanded && !isEditing && (
-                  <div className="px-4 pb-3 border-t bg-gray-50 rounded-b-xl print:hidden">
-                    <div className="grid sm:grid-cols-2 gap-3 mt-3">
-                      {meal && (
-                        <div>
-                          <p className="text-xs font-semibold text-gray-500 mb-1">Sastojci jela:</p>
-                          <ul className="text-xs text-gray-600 space-y-0.5">
-                            {meal.ingredients.map((ing, i) => (
-                              <li key={i}>{getIngredientName(ing.ingredientId)} {ing.amount} {ing.unit}</li>
-                            ))}
-                          </ul>
-                          {meal.recipe && (
-                            <details className="mt-2">
-                              <summary className="text-xs font-semibold text-amber-600 cursor-pointer">Recept</summary>
-                              <p className="text-xs text-gray-600 mt-1 whitespace-pre-wrap">{meal.recipe}</p>
-                            </details>
-                          )}
-                        </div>
-                      )}
-                      {side && (
-                        <div>
-                          <p className="text-xs font-semibold text-gray-500 mb-1">Sastojci dodatka:</p>
-                          <ul className="text-xs text-gray-600 space-y-0.5">
-                            {side.ingredients.map((ing, i) => (
-                              <li key={i}>{getIngredientName(ing.ingredientId)} {ing.amount} {ing.unit}</li>
-                            ))}
-                          </ul>
-                          {side.recipe && (
-                            <details className="mt-2">
-                              <summary className="text-xs font-semibold text-amber-600 cursor-pointer">Recept za prilog</summary>
-                              <p className="text-xs text-gray-600 mt-1 whitespace-pre-wrap">{side.recipe}</p>
-                            </details>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  </>
                 )}
               </div>
             );
@@ -276,82 +284,90 @@ export default function PlanDetail() {
       {/* SHOPPING TAB */}
       {tab === 'shopping' && (
         <div>
-          <div className="flex items-center justify-between mb-4 print:hidden">
-            <p className="text-sm text-gray-500">Odaberite što trebate kupiti</p>
-            <div className="flex gap-2">
-              <button
-                onClick={rebuildShopping}
-                className="flex items-center gap-1.5 text-sm px-3 py-1.5 border rounded-lg hover:bg-gray-50"
-                title="Regeneriraj listu iz plana"
-              >
-                <RefreshCw size={14} /> Osvježi
-              </button>
-              <button
-                onClick={handlePrint}
-                className="flex items-center gap-1.5 text-sm px-3 py-1.5 border rounded-lg hover:bg-gray-50"
-              >
-                <Printer size={14} /> Ispis
-              </button>
-            </div>
+          <div className="flex items-center justify-between mb-3 print:hidden">
+            <p className="text-sm text-gray-500">
+              Označite što trebate kupiti
+            </p>
+            <button
+              onClick={rebuildShopping}
+              className="flex items-center gap-1.5 text-sm px-3 py-2 border rounded-xl hover:bg-gray-50"
+            >
+              <RefreshCw size={14} /> Osvježi
+            </button>
           </div>
 
-          <div className="print:block hidden mb-4">
-            <h1 className="text-2xl font-bold">Lista za kupovinu</h1>
-            <p className="text-gray-500 text-sm">{plan.name}</p>
-          </div>
-
-          <div className="bg-white rounded-xl border shadow-sm overflow-hidden mb-4">
-            <div className="bg-amber-50 px-4 py-2 border-b">
-              <h3 className="font-semibold text-amber-800 text-sm">Sastojci za plan</h3>
+          {/* Plan ingredients */}
+          <div className="bg-white rounded-xl border overflow-hidden mb-3">
+            <div className="bg-amber-50 px-4 py-3 border-b">
+              <p className="font-semibold text-amber-800 text-sm">
+                Sastojci za plan
+                {shopping && shopping.items.length > 0 && (
+                  <span className="ml-2 text-amber-600 font-normal text-xs">
+                    {checkedCount}/{shopping.items.length} označeno
+                  </span>
+                )}
+              </p>
             </div>
             {!shopping || shopping.items.length === 0 ? (
-              <p className="text-center py-6 text-sm text-gray-400">
-                Nema sastojaka (dodajte sastojke jelima i dodacima).
-              </p>
+              <div className="text-center py-8 text-sm text-gray-400">
+                <UtensilsCrossed size={28} className="mx-auto mb-2 opacity-30" />
+                <p>Nema sastojaka</p>
+                <p className="text-xs">Dodajte sastojke jelima i dodacima</p>
+              </div>
             ) : (
-              <ul className="divide-y">
+              <ul>
                 {shopping.items.map((item) => (
                   <li
                     key={item.ingredientId}
-                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 ${item.checked ? 'opacity-50' : ''}`}
+                    className={`flex items-center gap-3 px-4 py-4 border-b last:border-0 active:bg-gray-50 cursor-pointer ${item.checked ? 'opacity-50' : ''}`}
                     onClick={() => toggleShoppingItem(item.ingredientId)}
                   >
-                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${item.checked ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}>
-                      {item.checked && <Check size={12} className="text-white" />}
+                    <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                      item.checked ? 'bg-green-500 border-green-500' : 'border-gray-300'
+                    }`}>
+                      {item.checked && <Check size={14} className="text-white" />}
                     </div>
                     <span className={`flex-1 text-sm ${item.checked ? 'line-through text-gray-400' : 'text-gray-800'}`}>
                       {getIngredientName(item.ingredientId)}
                     </span>
-                    <span className="text-sm text-gray-500 text-right">
-                      {item.amount} {item.unit}
-                    </span>
-                    <span className="print:hidden w-5 h-5 rounded border border-gray-300 flex items-center justify-center print:block" />
+                    {(item.amount || item.unit) && (
+                      <span className="text-sm text-gray-400 text-right flex-shrink-0">
+                        {item.amount} {item.unit}
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>
             )}
           </div>
 
-          <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-            <div className="bg-yellow-50 px-4 py-2 border-b">
-              <h3 className="font-semibold text-yellow-800 text-sm">⭐ Zajednički sastojci (uvijek potrebni)</h3>
+          {/* Common ingredients */}
+          <div className="bg-white rounded-xl border overflow-hidden">
+            <div className="bg-yellow-50 px-4 py-3 border-b">
+              <p className="font-semibold text-yellow-800 text-sm">
+                ⭐ Zajednički sastojci
+                <span className="ml-2 text-yellow-600 font-normal text-xs">
+                  {commonCheckedCount}/{data.ingredients.filter(i => i.isCommon).length} označeno
+                </span>
+              </p>
             </div>
-            <ul className="divide-y">
+            <ul>
               {data.ingredients.filter((i) => i.isCommon).map((ing) => {
                 const checked = shopping?.commonChecked[ing.id] ?? false;
                 return (
                   <li
                     key={ing.id}
-                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 ${checked ? 'opacity-50' : ''}`}
+                    className={`flex items-center gap-3 px-4 py-4 border-b last:border-0 active:bg-gray-50 cursor-pointer ${checked ? 'opacity-50' : ''}`}
                     onClick={() => toggleCommonItem(ing.id)}
                   >
-                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${checked ? 'bg-green-500 border-green-500' : 'border-yellow-400'}`}>
-                      {checked && <Check size={12} className="text-white" />}
+                    <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                      checked ? 'bg-green-500 border-green-500' : 'border-yellow-400'
+                    }`}>
+                      {checked && <Check size={14} className="text-white" />}
                     </div>
                     <span className={`flex-1 text-sm ${checked ? 'line-through text-gray-400' : 'text-gray-800'}`}>
                       {ing.name}
                     </span>
-                    <span className="print:hidden w-5 h-5 rounded border border-gray-300 flex items-center justify-center" />
                   </li>
                 );
               })}
@@ -384,9 +400,9 @@ function EditDayForm({
     : data.sides;
 
   return (
-    <div className="space-y-2 mt-1">
+    <div className="space-y-3">
       <select
-        className="w-full border rounded-lg px-2 py-1.5 text-sm"
+        className="w-full border rounded-xl px-4 py-3 text-sm"
         value={mealId}
         onChange={(e) => { setMealId(e.target.value); setSideId(''); }}
       >
@@ -396,7 +412,7 @@ function EditDayForm({
         ))}
       </select>
       <select
-        className="w-full border rounded-lg px-2 py-1.5 text-sm"
+        className="w-full border rounded-xl px-4 py-3 text-sm"
         value={sideId}
         onChange={(e) => setSideId(e.target.value)}
       >
@@ -406,19 +422,19 @@ function EditDayForm({
         ))}
       </select>
       <input
-        className="w-full border rounded-lg px-2 py-1.5 text-sm"
-        placeholder="Bilješka..."
+        className="w-full border rounded-xl px-4 py-3 text-sm"
+        placeholder="Bilješka (neobavezno)"
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
       />
       <div className="flex gap-2">
         <button
           onClick={() => onSave({ ...day, mealId, sideId, notes })}
-          className="flex-1 bg-amber-600 text-white py-1.5 rounded-lg text-sm hover:bg-amber-700"
+          className="flex-1 bg-amber-600 text-white py-3 rounded-xl text-sm font-medium"
         >
           Spremi
         </button>
-        <button onClick={onCancel} className="flex-1 border py-1.5 rounded-lg text-sm hover:bg-gray-50">
+        <button onClick={onCancel} className="flex-1 border py-3 rounded-xl text-sm font-medium text-gray-600">
           Odustani
         </button>
       </div>

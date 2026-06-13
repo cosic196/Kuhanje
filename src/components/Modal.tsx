@@ -12,22 +12,32 @@ export default function Modal({ title, onClose, children, wide }: ModalProps) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', handler);
+      document.body.style.overflow = '';
+    };
   }, [onClose]);
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/50"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className={`bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh] w-full ${wide ? 'max-w-3xl' : 'max-w-lg'}`}>
-        <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
-          <button onClick={onClose} className="p-1 rounded hover:bg-gray-100 text-gray-500">
+      {/* Bottom sheet on mobile, centered dialog on desktop */}
+      <div className={`bg-white w-full rounded-t-2xl md:rounded-xl shadow-2xl flex flex-col md:max-w-lg ${wide ? 'md:max-w-3xl' : ''} max-h-[90vh]`}>
+        {/* Drag handle — mobile only */}
+        <div className="flex justify-center pt-3 pb-1 md:hidden">
+          <div className="w-10 h-1 bg-gray-300 rounded-full" />
+        </div>
+
+        <div className="flex items-center justify-between px-4 py-3 border-b">
+          <h2 className="text-base font-semibold text-gray-800">{title}</h2>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 -mr-1">
             <X size={20} />
           </button>
         </div>
-        <div className="overflow-y-auto flex-1 p-6">{children}</div>
+        <div className="overflow-y-auto flex-1 p-4">{children}</div>
       </div>
     </div>
   );
