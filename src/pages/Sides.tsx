@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, Layers, Check, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, Layers, Check, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { useApp } from '../AppContext';
 import Modal from '../components/Modal';
 import IngredientEditor from '../components/IngredientEditor';
@@ -57,8 +57,14 @@ export default function Sides() {
     setShowNewCat(false);
   };
 
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const toggleExpand = (id: string) =>
+    setExpandedIds((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
   const getCategoryName = (id: string) =>
     data.sideCategories.find((c) => c.id === id)?.name ?? 'Ostalo';
+  const getIngredientName = (id: string) =>
+    data.ingredients.find((i) => i.id === id)?.name ?? '?';
 
   const sortedSides = [...data.sides].sort((a, b) => a.name.localeCompare(b.name, 'hr'));
   const sortedCategories = [...data.sideCategories].sort((a, b) => a.name.localeCompare(b.name, 'hr'));
@@ -83,31 +89,74 @@ export default function Sides() {
         </div>
       ) : (
         <div className="space-y-2">
-          {sortedSides.map((s) => (
-            <div key={s.id} className="bg-white rounded-xl border p-4">
-              <div className="flex items-center gap-3">
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-800 truncate">{s.name}</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
-                      {getCategoryName(s.categoryId)}
+          {sortedSides.map((s) => {
+            const expanded = expandedIds.has(s.id);
+            return (
+              <div key={s.id} className="bg-white rounded-xl border overflow-hidden">
+                <div
+                  className="flex items-center gap-3 p-4 cursor-pointer select-none"
+                  onClick={() => toggleExpand(s.id)}
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-800 truncate">{s.name}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                        {getCategoryName(s.categoryId)}
+                      </span>
+                      {s.ingredients.length > 0 && (
+                        <span className="text-xs text-gray-400">{s.ingredients.length} nam.</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-1 flex-shrink-0 items-center">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openEdit(s); }}
+                      className="p-2.5 text-gray-400 hover:text-amber-600 rounded-lg active:bg-amber-50"
+                    >
+                      <Pencil size={17} />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); remove(s.id); }}
+                      className="p-2.5 text-gray-400 hover:text-red-500 rounded-lg active:bg-red-50"
+                    >
+                      <Trash2 size={17} />
+                    </button>
+                    <span className="text-gray-300 ml-1">
+                      {expanded ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
                     </span>
-                    {s.ingredients.length > 0 && (
-                      <span className="text-xs text-gray-400">{s.ingredients.length} nam.</span>
-                    )}
                   </div>
                 </div>
-                <div className="flex gap-1 flex-shrink-0">
-                  <button onClick={() => openEdit(s)} className="p-2.5 text-gray-400 hover:text-amber-600 rounded-lg active:bg-amber-50">
-                    <Pencil size={17} />
-                  </button>
-                  <button onClick={() => remove(s.id)} className="p-2.5 text-gray-400 hover:text-red-500 rounded-lg active:bg-red-50">
-                    <Trash2 size={17} />
-                  </button>
-                </div>
+                {expanded && (
+                  <div className="border-t bg-gray-50 px-4 py-3 space-y-3">
+                    {s.ingredients.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Namirnice</p>
+                        <ul className="space-y-1">
+                          {s.ingredients.map((ing, i) => (
+                            <li key={i} className="flex justify-between text-sm text-gray-700">
+                              <span>{getIngredientName(ing.ingredientId)}</span>
+                              {(ing.amount || ing.unit) && (
+                                <span className="text-gray-400 ml-4 flex-shrink-0">{ing.amount} {ing.unit}</span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {s.recipe && (
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Recept</p>
+                        <p className="text-sm text-gray-600 whitespace-pre-wrap">{s.recipe}</p>
+                      </div>
+                    )}
+                    {s.ingredients.length === 0 && !s.recipe && (
+                      <p className="text-sm text-gray-400">Nema dodatnih detalja.</p>
+                    )}
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

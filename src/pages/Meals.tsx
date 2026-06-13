@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, Search, ChefHat, Check, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, ChefHat, Check, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { useApp } from '../AppContext';
 import Modal from '../components/Modal';
 import IngredientEditor from '../components/IngredientEditor';
@@ -120,8 +120,16 @@ export default function Meals() {
     setShowNewSideCat(false);
   };
 
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const toggleExpand = (id: string) =>
+    setExpandedIds((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
   const getCategoryName = (id: string) =>
     data.mealCategories.find((c) => c.id === id)?.name ?? 'Ostalo';
+  const getIngredientName = (id: string) =>
+    data.ingredients.find((i) => i.id === id)?.name ?? '?';
+  const getSideName = (id: string) =>
+    data.sides.find((s) => s.id === id)?.name ?? '?';
 
   return (
     <div>
@@ -153,34 +161,89 @@ export default function Meals() {
         </div>
       ) : (
         <div className="space-y-2">
-          {filtered.map((m) => (
-            <div key={m.id} className="bg-white rounded-xl border p-4">
-              <div className="flex items-center gap-3">
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-800 truncate">{m.name}</p>
-                  <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
-                      {getCategoryName(m.categoryId)}
+          {filtered.map((m) => {
+            const expanded = expandedIds.has(m.id);
+            return (
+              <div key={m.id} className="bg-white rounded-xl border overflow-hidden">
+                <div
+                  className="flex items-center gap-3 p-4 cursor-pointer select-none"
+                  onClick={() => toggleExpand(m.id)}
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-800 truncate">{m.name}</p>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                        {getCategoryName(m.categoryId)}
+                      </span>
+                      {m.ingredients.length > 0 && (
+                        <span className="text-xs text-gray-400">{m.ingredients.length} nam.</span>
+                      )}
+                      {m.possibleSideIds.length > 0 && (
+                        <span className="text-xs text-gray-400">{m.possibleSideIds.length} pril.</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-1 flex-shrink-0 items-center">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openEdit(m); }}
+                      className="p-2.5 text-gray-400 hover:text-amber-600 rounded-lg active:bg-amber-50"
+                    >
+                      <Pencil size={17} />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); remove(m.id); }}
+                      className="p-2.5 text-gray-400 hover:text-red-500 rounded-lg active:bg-red-50"
+                    >
+                      <Trash2 size={17} />
+                    </button>
+                    <span className="text-gray-300 ml-1">
+                      {expanded ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
                     </span>
-                    {m.ingredients.length > 0 && (
-                      <span className="text-xs text-gray-400">{m.ingredients.length} nam.</span>
-                    )}
-                    {m.possibleSideIds.length > 0 && (
-                      <span className="text-xs text-gray-400">{m.possibleSideIds.length} pril.</span>
-                    )}
                   </div>
                 </div>
-                <div className="flex gap-1 flex-shrink-0">
-                  <button onClick={() => openEdit(m)} className="p-2.5 text-gray-400 hover:text-amber-600 rounded-lg active:bg-amber-50">
-                    <Pencil size={17} />
-                  </button>
-                  <button onClick={() => remove(m.id)} className="p-2.5 text-gray-400 hover:text-red-500 rounded-lg active:bg-red-50">
-                    <Trash2 size={17} />
-                  </button>
-                </div>
+                {expanded && (
+                  <div className="border-t bg-gray-50 px-4 py-3 space-y-3">
+                    {m.ingredients.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Namirnice</p>
+                        <ul className="space-y-1">
+                          {m.ingredients.map((ing, i) => (
+                            <li key={i} className="flex justify-between text-sm text-gray-700">
+                              <span>{getIngredientName(ing.ingredientId)}</span>
+                              {(ing.amount || ing.unit) && (
+                                <span className="text-gray-400 ml-4 flex-shrink-0">{ing.amount} {ing.unit}</span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {m.possibleSideIds.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Mogući prilozi</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {m.possibleSideIds.map((id) => (
+                            <span key={id} className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full">
+                              {getSideName(id)}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {m.recipe && (
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Recept</p>
+                        <p className="text-sm text-gray-600 whitespace-pre-wrap">{m.recipe}</p>
+                      </div>
+                    )}
+                    {m.ingredients.length === 0 && m.possibleSideIds.length === 0 && !m.recipe && (
+                      <p className="text-sm text-gray-400">Nema dodatnih detalja.</p>
+                    )}
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
