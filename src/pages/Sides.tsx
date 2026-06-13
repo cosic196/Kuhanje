@@ -22,7 +22,13 @@ export default function Sides() {
   const [newCatName, setNewCatName] = useState('');
 
   const resetInline = () => { setShowNewCat(false); setNewCatName(''); };
-  const openNew = () => { setForm(empty()); setEditing(null); setIsNew(true); resetInline(); };
+  const openNew = () => {
+    const firstCatId = sortedCategories[0]?.id ?? 'sc_ostalo';
+    setForm({ ...empty(), categoryId: firstCatId });
+    setEditing(null);
+    setIsNew(true);
+    resetInline();
+  };
   const openEdit = (s: Side) => {
     setForm({ name: s.name, ingredients: s.ingredients, categoryId: s.categoryId, recipe: s.recipe });
     setEditing(s);
@@ -195,7 +201,7 @@ export default function Sides() {
               <input
                 className="w-full border rounded-xl px-4 py-3"
                 value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder="Npr. Tjestenina"
                 autoFocus
               />
@@ -206,7 +212,7 @@ export default function Sides() {
                 <select
                   className="flex-1 border rounded-xl px-4 py-3"
                   value={form.categoryId}
-                  onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+                  onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))}
                 >
                   {sortedCategories.map((c) => (
                     <option key={c.id} value={c.id}>{c.name}</option>
@@ -254,7 +260,7 @@ export default function Sides() {
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Namirnice</label>
               <IngredientEditor
                 items={form.ingredients}
-                onChange={(items) => setForm({ ...form, ingredients: items })}
+                onChange={(items) => setForm((f) => ({ ...f, ingredients: items }))}
               />
             </div>
             <div>
@@ -262,7 +268,7 @@ export default function Sides() {
               <textarea
                 className="w-full border rounded-xl px-4 py-3 text-sm min-h-[80px] resize-none"
                 value={form.recipe}
-                onChange={(e) => setForm({ ...form, recipe: e.target.value })}
+                onChange={(e) => setForm((f) => ({ ...f, recipe: e.target.value }))}
                 placeholder="Upute za pripremu..."
               />
             </div>
