@@ -156,8 +156,19 @@ function buildDays(
         shuffle([...emptySlots])
           .slice(0, count)
           .forEach((slot, i) => {
-            days[slot].mealId = pool[i].id;
-            usedMealIds.add(pool[i].id);
+            const meal = pool[i];
+            days[slot].mealId = meal.id;
+            days[slot].isSpanContinuation = false;
+            usedMealIds.add(meal.id);
+            const span = Math.max(1, meal.daysCount ?? 1);
+            for (let k = 1; k < span; k++) {
+              const nextSlot = slot + k;
+              if (nextSlot >= numDays) break;
+              if (fixedDays.has(nextSlot)) break;
+              if (days[nextSlot].mealId) break;
+              days[nextSlot].mealId = meal.id;
+              days[nextSlot].isSpanContinuation = true;
+            }
           });
       }
 
