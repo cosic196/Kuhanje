@@ -12,6 +12,7 @@ const empty = (): Omit<Meal, 'id'> => ({
   categoryId: 'mc_ostalo',
   possibleSideIds: [],
   recipe: '',
+  daysCount: 1,
 });
 
 export default function Meals() {
@@ -58,7 +59,7 @@ export default function Meals() {
     resetInline();
   };
   const openEdit = (m: Meal) => {
-    setForm({ name: m.name, ingredients: m.ingredients, categoryId: m.categoryId, possibleSideIds: m.possibleSideIds, recipe: m.recipe });
+    setForm({ name: m.name, ingredients: m.ingredients, categoryId: m.categoryId, possibleSideIds: m.possibleSideIds, recipe: m.recipe, daysCount: m.daysCount ?? 1 });
     setEditing(m);
     setIsNew(false);
     resetInline();
@@ -202,7 +203,14 @@ export default function Meals() {
                               onClick={() => toggleExpand(m.id)}
                             >
                               <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-gray-800 truncate">{m.name}</p>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <p className="font-semibold text-gray-800 truncate">{m.name}</p>
+                                  {(m.daysCount ?? 1) > 1 && (
+                                    <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full flex-shrink-0">
+                                      {m.daysCount} dana
+                                    </span>
+                                  )}
+                                </div>
                                 {(m.ingredients.length > 0 || m.possibleSideIds.length > 0) && (
                                   <div className="flex items-center gap-2 mt-1 flex-wrap">
                                     {m.ingredients.length > 0 && (
@@ -295,6 +303,30 @@ export default function Meals() {
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder="Npr. Grah s kobasicom"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Traje dana</label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="number"
+                  className="w-20 border rounded-xl px-4 py-3 text-center"
+                  min={1}
+                  max={7}
+                  value={form.daysCount ?? 1}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      daysCount: Math.max(1, Math.min(7, parseInt(e.target.value) || 1)),
+                    }))
+                  }
+                />
+                <span className="text-sm text-gray-500">
+                  {(form.daysCount ?? 1) === 1
+                    ? 'dan (standardno)'
+                    : `uzastopna dana u rasporedu`}
+                </span>
+              </div>
             </div>
 
             <div>

@@ -35,6 +35,7 @@ export interface Meal {
   categoryId: string;
   possibleSideIds: string[];
   recipe: string;
+  daysCount?: number;
 }
 
 export type RuleType =
@@ -86,6 +87,7 @@ export interface PlanDay {
   mealId: string;
   sideId: string;
   notes: string;
+  isSpanContinuation?: boolean;
 }
 
 export interface Plan {

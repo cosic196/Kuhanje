@@ -167,8 +167,12 @@ function buildDays(
     if (!success) continue;
 
     // Fill remaining empty days
-    for (let di = 0; di < numDays; di++) {
-      if (fixedDays.has(di) || days[di].mealId) continue;
+    let di = 0;
+    while (di < numDays) {
+      if (fixedDays.has(di) || days[di].mealId) {
+        di++;
+        continue;
+      }
 
       const recentCats =
         noRepeatMealCatRule?.enabled
@@ -190,8 +194,22 @@ function buildDays(
         break;
       }
 
+      const span = Math.max(1, meal.daysCount ?? 1);
       days[di].mealId = meal.id;
+      days[di].isSpanContinuation = false;
       usedMealIds.add(meal.id);
+
+      // Fill continuation days with the same meal
+      for (let k = 1; k < span; k++) {
+        const nextDi = di + k;
+        if (nextDi >= numDays) break;
+        if (fixedDays.has(nextDi)) break;
+        if (days[nextDi].mealId) break; // already filled by required rule
+        days[nextDi].mealId = meal.id;
+        days[nextDi].isSpanContinuation = true;
+      }
+
+      di++;
     }
 
     if (!success) continue;
@@ -199,6 +217,11 @@ function buildDays(
     // Pick sides for non-fixed days
     for (let di = 0; di < numDays; di++) {
       if (fixedDays.has(di)) continue;
+      if (days[di].isSpanContinuation) {
+        // Continuation day inherits the same side as the first day of the span
+        days[di].sideId = di > 0 ? (days[di - 1]?.sideId ?? '') : '';
+        continue;
+      }
       const meal = meals.find((m) => m.id === days[di].mealId);
       if (!meal) continue;
       days[di].sideId = pickSide(meal, sides, days, di, noRepeatSideRule)?.id ?? '';

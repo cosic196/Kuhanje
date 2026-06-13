@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft, Printer, ShoppingCart, Pencil, Check, ChevronDown, ChevronUp,
-  RefreshCw, UtensilsCrossed, Loader2, X,
+  RefreshCw, UtensilsCrossed, Loader2, X, CornerDownRight,
 } from 'lucide-react';
 import { useApp } from '../AppContext';
 import type { PlanDay, ShoppingItem, IngredientAmount } from '../types';
@@ -39,6 +39,7 @@ function buildShoppingItems(
   };
 
   for (const day of days) {
+    if (day.isSpanContinuation) continue;
     if (day.mealId) {
       const meal = data.meals.find((m) => m.id === day.mealId);
       if (meal) addItems(meal.ingredients);
@@ -304,13 +305,14 @@ export default function PlanDetail() {
               const isEditing = editDayIdx === idx;
               const isExpanded = expandedDayIdx === idx;
               const isKept = !regenMode || keptDays.has(idx);
+              const isContinuation = day.isSpanContinuation === true;
 
               return (
                 <div
                   key={idx}
                   className={`bg-white rounded-xl border overflow-hidden print:border-b print:rounded-none print:shadow-none transition-opacity ${
                     regenMode && !isKept ? 'opacity-50 border-dashed border-amber-300' : ''
-                  }`}
+                  } ${isContinuation ? 'border-l-2 border-l-amber-300' : ''}`}
                 >
                   {isEditing && !regenMode ? (
                     <div className="p-4">
@@ -354,10 +356,18 @@ export default function PlanDetail() {
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-gray-400">{formatDate(day.date, true)}</p>
-                          <p className="font-semibold text-gray-800 text-sm truncate">
-                            {meal ? meal.name : <span className="text-red-400 italic">Nije odabrano</span>}
-                            {side && <span className="text-gray-400 font-normal"> + {side.name}</span>}
-                          </p>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {isContinuation && (
+                              <CornerDownRight size={13} className="text-amber-400 flex-shrink-0" />
+                            )}
+                            <p className={`font-semibold text-sm truncate ${isContinuation ? 'text-gray-500' : 'text-gray-800'}`}>
+                              {meal ? meal.name : <span className="text-red-400 italic">Nije odabrano</span>}
+                              {side && <span className="text-gray-400 font-normal"> + {side.name}</span>}
+                            </p>
+                            {isContinuation && (
+                              <span className="text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded flex-shrink-0">nastavak</span>
+                            )}
+                          </div>
                           {day.notes && <p className="text-xs text-gray-400 mt-0.5 truncate">{day.notes}</p>}
                         </div>
                         {!regenMode && (
