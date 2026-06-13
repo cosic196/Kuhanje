@@ -17,7 +17,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
+    const root = document.documentElement;
+    root.classList.toggle('dark', theme === 'dark');
+    root.style.backgroundColor = theme === 'dark' ? '#111827' : '';
     localStorage.setItem('kuhanje_theme', theme);
   }, [theme]);
 
