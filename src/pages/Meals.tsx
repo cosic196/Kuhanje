@@ -121,8 +121,12 @@ export default function Meals() {
   };
 
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [collapsedCats, setCollapsedCats] = useState<Set<string>>(new Set());
+
   const toggleExpand = (id: string) =>
     setExpandedIds((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const toggleCat = (id: string) =>
+    setCollapsedCats((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
   const getCategoryName = (id: string) =>
     data.mealCategories.find((c) => c.id === id)?.name ?? 'Ostalo';
@@ -159,93 +163,122 @@ export default function Meals() {
           <p className="font-medium">Nema jela</p>
           <p className="text-sm mt-1">Dodajte prvo jelo!</p>
         </div>
-      ) : (
-        <div className="space-y-2">
-          {filtered.map((m) => {
-            const expanded = expandedIds.has(m.id);
-            return (
-              <div key={m.id} className="bg-white rounded-xl border overflow-hidden">
-                <div
-                  className="flex items-center gap-3 p-4 cursor-pointer select-none"
-                  onClick={() => toggleExpand(m.id)}
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-800 truncate">{m.name}</p>
-                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
-                        {getCategoryName(m.categoryId)}
-                      </span>
-                      {m.ingredients.length > 0 && (
-                        <span className="text-xs text-gray-400">{m.ingredients.length} nam.</span>
-                      )}
-                      {m.possibleSideIds.length > 0 && (
-                        <span className="text-xs text-gray-400">{m.possibleSideIds.length} pril.</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex gap-1 flex-shrink-0 items-center">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); openEdit(m); }}
-                      className="p-2.5 text-gray-400 hover:text-amber-600 rounded-lg active:bg-amber-50"
-                    >
-                      <Pencil size={17} />
-                    </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); remove(m.id); }}
-                      className="p-2.5 text-gray-400 hover:text-red-500 rounded-lg active:bg-red-50"
-                    >
-                      <Trash2 size={17} />
-                    </button>
-                    <span className="text-gray-300 ml-1">
-                      {expanded ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
+      ) : (() => {
+        const groups = sortedCategories
+          .map((cat) => ({ cat, items: filtered.filter((m) => m.categoryId === cat.id) }))
+          .filter(({ items }) => items.length > 0);
+        const orphans = filtered.filter((m) => !data.mealCategories.some((c) => c.id === m.categoryId));
+        if (orphans.length > 0) groups.push({ cat: { id: '__other', name: 'Ostalo' }, items: orphans });
+
+        return (
+          <div className="space-y-4">
+            {groups.map(({ cat, items }) => {
+              const collapsed = collapsedCats.has(cat.id);
+              return (
+                <div key={cat.id}>
+                  <button
+                    onClick={() => toggleCat(cat.id)}
+                    className="w-full flex items-center gap-2 mb-2 group"
+                  >
+                    <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">{cat.name}</span>
+                    <span className="text-xs text-gray-400 font-normal">({items.length})</span>
+                    <div className="flex-1 h-px bg-gray-200" />
+                    <span className="text-gray-400">
+                      {collapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
                     </span>
-                  </div>
+                  </button>
+                  {!collapsed && (
+                    <div className="space-y-2">
+                      {items.map((m) => {
+                        const expanded = expandedIds.has(m.id);
+                        return (
+                          <div key={m.id} className="bg-white rounded-xl border overflow-hidden">
+                            <div
+                              className="flex items-center gap-3 p-4 cursor-pointer select-none"
+                              onClick={() => toggleExpand(m.id)}
+                            >
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-gray-800 truncate">{m.name}</p>
+                                {(m.ingredients.length > 0 || m.possibleSideIds.length > 0) && (
+                                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                    {m.ingredients.length > 0 && (
+                                      <span className="text-xs text-gray-400">{m.ingredients.length} nam.</span>
+                                    )}
+                                    {m.possibleSideIds.length > 0 && (
+                                      <span className="text-xs text-gray-400">{m.possibleSideIds.length} pril.</span>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex gap-1 flex-shrink-0 items-center">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); openEdit(m); }}
+                                  className="p-2.5 text-gray-400 hover:text-amber-600 rounded-lg active:bg-amber-50"
+                                >
+                                  <Pencil size={17} />
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); remove(m.id); }}
+                                  className="p-2.5 text-gray-400 hover:text-red-500 rounded-lg active:bg-red-50"
+                                >
+                                  <Trash2 size={17} />
+                                </button>
+                                <span className="text-gray-300 ml-1">
+                                  {expanded ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
+                                </span>
+                              </div>
+                            </div>
+                            {expanded && (
+                              <div className="border-t bg-gray-50 px-4 py-3 space-y-3">
+                                {m.ingredients.length > 0 && (
+                                  <div>
+                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Namirnice</p>
+                                    <ul className="space-y-1">
+                                      {m.ingredients.map((ing, i) => (
+                                        <li key={i} className="flex justify-between text-sm text-gray-700">
+                                          <span>{getIngredientName(ing.ingredientId)}</span>
+                                          {(ing.amount || ing.unit) && (
+                                            <span className="text-gray-400 ml-4 flex-shrink-0">{ing.amount} {ing.unit}</span>
+                                          )}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                                {m.possibleSideIds.length > 0 && (
+                                  <div>
+                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Mogući prilozi</p>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {m.possibleSideIds.map((id) => (
+                                        <span key={id} className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full">
+                                          {getSideName(id)}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                                {m.recipe && (
+                                  <div>
+                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Recept</p>
+                                    <p className="text-sm text-gray-600 whitespace-pre-wrap">{m.recipe}</p>
+                                  </div>
+                                )}
+                                {m.ingredients.length === 0 && m.possibleSideIds.length === 0 && !m.recipe && (
+                                  <p className="text-sm text-gray-400">Nema dodatnih detalja.</p>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-                {expanded && (
-                  <div className="border-t bg-gray-50 px-4 py-3 space-y-3">
-                    {m.ingredients.length > 0 && (
-                      <div>
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Namirnice</p>
-                        <ul className="space-y-1">
-                          {m.ingredients.map((ing, i) => (
-                            <li key={i} className="flex justify-between text-sm text-gray-700">
-                              <span>{getIngredientName(ing.ingredientId)}</span>
-                              {(ing.amount || ing.unit) && (
-                                <span className="text-gray-400 ml-4 flex-shrink-0">{ing.amount} {ing.unit}</span>
-                              )}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {m.possibleSideIds.length > 0 && (
-                      <div>
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Mogući prilozi</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {m.possibleSideIds.map((id) => (
-                            <span key={id} className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full">
-                              {getSideName(id)}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {m.recipe && (
-                      <div>
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Recept</p>
-                        <p className="text-sm text-gray-600 whitespace-pre-wrap">{m.recipe}</p>
-                      </div>
-                    )}
-                    {m.ingredients.length === 0 && m.possibleSideIds.length === 0 && !m.recipe && (
-                      <p className="text-sm text-gray-400">Nema dodatnih detalja.</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        );
+      })()}
 
       {(isNew || editing) && (
         <Modal title={isNew ? 'Novo jelo' : 'Uredi jelo'} onClose={close} wide>
