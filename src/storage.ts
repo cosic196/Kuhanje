@@ -79,7 +79,7 @@ export function loadData(): AppData {
       sides: parsed.sides ?? defaultData.sides,
       meals: parsed.meals ?? defaultData.meals,
       rules: parsed.rules ?? defaultData.rules,
-      plans: parsed.plans ?? defaultData.plans,
+      plans: (parsed.plans ?? defaultData.plans).slice(0, 10),
       planShopping: parsed.planShopping ?? defaultData.planShopping,
       settings: parsed.settings ?? defaultData.settings,
     };

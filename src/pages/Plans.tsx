@@ -98,7 +98,7 @@ export default function Plans() {
 
   const confirmPlan = () => {
     if (!proposedPlan) return;
-    setData((p) => ({ ...p, plans: [proposedPlan, ...p.plans] }));
+    setData((p) => ({ ...p, plans: [proposedPlan, ...p.plans].slice(0, 10) }));
     cancelNew();
   };
 

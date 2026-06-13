@@ -241,13 +241,13 @@ export default function Rules() {
             <input
               type="number"
               min={1}
-              max={30}
+              max={14}
               className="w-full border rounded-xl px-3 py-2.5 text-sm"
               value={data.settings.planDurationDays}
               onChange={(e) =>
                 setData((p) => ({
                   ...p,
-                  settings: { ...p.settings, planDurationDays: Number(e.target.value) },
+                  settings: { ...p.settings, planDurationDays: Math.min(14, Math.max(1, Number(e.target.value))) },
                 }))
               }
             />
@@ -257,13 +257,13 @@ export default function Rules() {
             <input
               type="number"
               min={1}
-              max={30}
+              max={14}
               className="w-full border rounded-xl px-3 py-2.5 text-sm"
               value={data.settings.noRepeatWithinPlanDays}
               onChange={(e) =>
                 setData((p) => ({
                   ...p,
-                  settings: { ...p.settings, noRepeatWithinPlanDays: Number(e.target.value) },
+                  settings: { ...p.settings, noRepeatWithinPlanDays: Math.min(14, Math.max(1, Number(e.target.value))) },
                 }))
               }
             />
@@ -299,7 +299,7 @@ export default function Rules() {
               className="w-20 border rounded-xl px-3 py-2 text-sm"
               value={noRepeatSideRule.windowDays}
               onChange={(e) =>
-                updateSingletonRule({ ...noRepeatSideRule, windowDays: Number(e.target.value) })
+                updateSingletonRule({ ...noRepeatSideRule, windowDays: Math.min(14, Math.max(2, Number(e.target.value))) })
               }
             />
           </div>
@@ -334,7 +334,7 @@ export default function Rules() {
               className="w-20 border rounded-xl px-3 py-2 text-sm"
               value={noRepeatMealRule.windowDays}
               onChange={(e) =>
-                updateSingletonRule({ ...noRepeatMealRule, windowDays: Number(e.target.value) })
+                updateSingletonRule({ ...noRepeatMealRule, windowDays: Math.min(14, Math.max(2, Number(e.target.value))) })
               }
             />
           </div>
@@ -365,11 +365,11 @@ export default function Rules() {
             <input
               type="number"
               min={1}
-              max={60}
+              max={14}
               className="w-20 border rounded-xl px-3 py-2 text-sm"
               value={noRecentRule.recentDays}
               onChange={(e) =>
-                updateSingletonRule({ ...noRecentRule, recentDays: Number(e.target.value) })
+                updateSingletonRule({ ...noRecentRule, recentDays: Math.min(14, Math.max(1, Number(e.target.value))) })
               }
             />
           </div>
