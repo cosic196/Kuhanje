@@ -35,6 +35,12 @@ export const defaultData: AppData = {
       windowDays: 3,
     },
     {
+      id: 'rule_no_repeat_meal',
+      type: 'no_repeat_meal_category',
+      enabled: false,
+      windowDays: 2,
+    },
+    {
       id: 'rule_no_recent',
       type: 'no_recent_meals',
       enabled: true,
@@ -47,9 +53,8 @@ export const defaultData: AppData = {
       categoryId: 'mc_varivo',
       categoryType: 'meal',
       minCount: 1,
+      maxCount: 2,
       everyNDays: 7,
-      consecutive: true,
-      consecutiveDays: 2,
     },
   ],
   plans: [],

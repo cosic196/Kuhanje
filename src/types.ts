@@ -39,12 +39,20 @@ export interface Meal {
 
 export type RuleType =
   | 'no_repeat_side_category'
+  | 'no_repeat_meal_category'
   | 'required_category'
   | 'no_recent_meals';
 
 export interface NoRepeatSideCategoryRule {
   id: string;
   type: 'no_repeat_side_category';
+  enabled: boolean;
+  windowDays: number;
+}
+
+export interface NoRepeatMealCategoryRule {
+  id: string;
+  type: 'no_repeat_meal_category';
   enabled: boolean;
   windowDays: number;
 }
@@ -56,9 +64,8 @@ export interface RequiredCategoryRule {
   categoryId: string;
   categoryType: 'meal' | 'side';
   minCount: number;
+  maxCount?: number;
   everyNDays: number;
-  consecutive: boolean;
-  consecutiveDays: number;
 }
 
 export interface NoRecentMealsRule {
@@ -68,7 +75,11 @@ export interface NoRecentMealsRule {
   recentDays: number;
 }
 
-export type PlanRule = NoRepeatSideCategoryRule | RequiredCategoryRule | NoRecentMealsRule;
+export type PlanRule =
+  | NoRepeatSideCategoryRule
+  | NoRepeatMealCategoryRule
+  | RequiredCategoryRule
+  | NoRecentMealsRule;
 
 export interface PlanDay {
   date: string;

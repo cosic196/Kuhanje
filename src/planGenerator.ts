@@ -5,6 +5,7 @@ import type {
   Meal,
   Side,
   NoRepeatSideCategoryRule,
+  NoRepeatMealCategoryRule,
   RequiredCategoryRule,
 } from './types';
 import { generateId } from './storage';
@@ -22,28 +23,20 @@ function getRecentMealIds(data: AppData, recentDays: number): Set<string> {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - recentDays);
   const recentIds = new Set<string>();
-
   for (const plan of data.plans) {
     for (const day of plan.days) {
       const d = new Date(day.date);
-      if (d >= cutoff) {
-        recentIds.add(day.mealId);
-      }
+      if (d >= cutoff) recentIds.add(day.mealId);
     }
   }
   return recentIds;
 }
 
-function getSideCategoryForDay(
-  days: PlanDay[],
-  sides: Side[],
-  dayIndex: number
-): string | null {
+function getSideCategoryForDay(days: PlanDay[], sides: Side[], dayIndex: number): string | null {
   if (dayIndex < 0 || dayIndex >= days.length) return null;
   const sideId = days[dayIndex].sideId;
   if (!sideId) return null;
-  const side = sides.find((s) => s.id === sideId);
-  return side?.categoryId ?? null;
+  return sides.find((s) => s.id === sideId)?.categoryId ?? null;
 }
 
 function pickSide(
@@ -54,156 +47,253 @@ function pickSide(
   noRepeatRule: NoRepeatSideCategoryRule | null
 ): Side | null {
   if (meal.possibleSideIds.length === 0) return null;
-
   const available = sides.filter((s) => meal.possibleSideIds.includes(s.id));
   if (available.length === 0) return null;
+  if (!noRepeatRule || !noRepeatRule.enabled) return shuffle(available)[0];
 
-  if (!noRepeatRule || !noRepeatRule.enabled) {
-    return shuffle(available)[0];
-  }
-
-  const windowDays = noRepeatRule.windowDays;
   const recentCategories = new Set<string>();
-  for (let i = Math.max(0, dayIndex - (windowDays - 1)); i < dayIndex; i++) {
+  for (let i = Math.max(0, dayIndex - (noRepeatRule.windowDays - 1)); i < dayIndex; i++) {
     const cat = getSideCategoryForDay(days, sides, i);
     if (cat) recentCategories.add(cat);
   }
-
   const candidates = available.filter((s) => !recentCategories.has(s.categoryId));
-  const pool = candidates.length > 0 ? candidates : available;
-  return shuffle(pool)[0];
+  return shuffle(candidates.length > 0 ? candidates : available)[0];
 }
 
-export function generatePlan(data: AppData, name: string, startDate: string): Plan | null {
-  const { meals, sides, rules, settings } = data;
-  const numDays = settings.planDurationDays;
+function getRecentMealCategories(
+  days: PlanDay[],
+  meals: Meal[],
+  dayIndex: number,
+  windowDays: number
+): Set<string> {
+  const cats = new Set<string>();
+  for (let i = Math.max(0, dayIndex - (windowDays - 1)); i < dayIndex; i++) {
+    const mealId = days[i]?.mealId;
+    if (!mealId) continue;
+    const cat = meals.find((m) => m.id === mealId)?.categoryId;
+    if (cat) cats.add(cat);
+  }
+  return cats;
+}
 
-  const noRepeatRule = rules.find(
-    (r) => r.type === 'no_repeat_side_category' && r.enabled
-  ) as NoRepeatSideCategoryRule | undefined ?? null;
-
-  const noRecentRule = rules.find((r) => r.type === 'no_recent_meals' && r.enabled);
-  const recentDays = noRecentRule?.type === 'no_recent_meals' ? noRecentRule.recentDays : 0;
-  const recentMealIds = recentDays > 0 ? getRecentMealIds(data, recentDays) : new Set<string>();
-
-  const requiredCategoryRules = rules.filter(
-    (r) => r.type === 'required_category' && r.enabled
-  ) as RequiredCategoryRule[];
-
-  const stew_rules = requiredCategoryRules.filter(
-    (r) => r.categoryType === 'meal' && r.consecutive
-  );
-
-  const days: PlanDay[] = Array.from({ length: numDays }, (_, i) => {
-    const d = new Date(startDate);
-    d.setDate(d.getDate() + i);
-    return {
-      date: d.toISOString().slice(0, 10),
-      mealId: '',
-      sideId: '',
-      notes: '',
-    };
-  });
-
-  const usedMealIds = new Set<string>();
-
-  const availableMeals = (exclude: Set<string>) =>
-    meals.filter((m) => !exclude.has(m.id) && !usedMealIds.has(m.id));
+function buildDays(
+  data: AppData,
+  numDays: number,
+  fixedDays: Map<number, PlanDay>,
+  recentMealIds: Set<string>,
+  noRepeatSideRule: NoRepeatSideCategoryRule | null,
+  noRepeatMealCatRule: NoRepeatMealCategoryRule | null,
+  requiredRules: RequiredCategoryRule[]
+): PlanDay[] | null {
+  const { meals, sides } = data;
 
   for (let attempt = 0; attempt < 50; attempt++) {
-    const daysCopy: PlanDay[] = days.map((d) => ({ ...d, mealId: '', sideId: '' }));
-    usedMealIds.clear();
-    let success = true;
-
-    const weekCount = Math.ceil(numDays / 7);
-    const stewSlots: number[] = [];
-
-    for (let w = 0; w < weekCount; w++) {
-      for (const rule of stew_rules) {
-        const windowStart = w * 7;
-        const windowEnd = Math.min((w + 1) * 7, numDays);
-        const windowSize = windowEnd - windowStart;
-        if (windowSize < 2) continue;
-
-        const maxStart = windowEnd - rule.consecutiveDays;
-        const startIdx = windowStart + Math.floor(Math.random() * (maxStart - windowStart + 1));
-        for (let d = startIdx; d < startIdx + rule.consecutiveDays && d < numDays; d++) {
-          stewSlots.push(d);
-        }
-      }
-    }
-
-    const stewMealPool = shuffle(
-      meals.filter(
-        (m) =>
-          stew_rules.some((r) => r.categoryId === m.categoryId) &&
-          !recentMealIds.has(m.id)
-      )
+    const days: PlanDay[] = Array.from({ length: numDays }, (_, i) =>
+      fixedDays.has(i)
+        ? { ...fixedDays.get(i)! }
+        : { date: '', mealId: '', sideId: '', notes: '' }
     );
 
-    let stewMealIndex = 0;
-    let currentStewMealId = '';
-    for (let di = 0; di < numDays; di++) {
-      const isStewSlot = stewSlots.includes(di);
+    const usedMealIds = new Set<string>(
+      Array.from(fixedDays.values())
+        .map((d) => d.mealId)
+        .filter(Boolean)
+    );
 
-      if (isStewSlot) {
-        const prevSlot = di > 0 && stewSlots.includes(di - 1);
+    let success = true;
 
-        if (!prevSlot) {
-          if (stewMealPool[stewMealIndex]) {
-            currentStewMealId = stewMealPool[stewMealIndex].id;
-            stewMealIndex++;
-          } else {
-            success = false;
-            break;
+    // Assign required meal category slots first
+    for (const rule of requiredRules) {
+      if (rule.categoryType !== 'meal') continue;
+      const maxCount = rule.maxCount ?? rule.minCount;
+      const windowCount = Math.ceil(numDays / rule.everyNDays);
+
+      for (let w = 0; w < windowCount; w++) {
+        const wStart = w * rule.everyNDays;
+        const wEnd = Math.min((w + 1) * rule.everyNDays, numDays);
+
+        // Count already placed meals of this category in fixed days
+        let fixedCount = 0;
+        for (let di = wStart; di < wEnd; di++) {
+          if (fixedDays.has(di)) {
+            const m = meals.find((m) => m.id === days[di].mealId);
+            if (m?.categoryId === rule.categoryId) fixedCount++;
           }
         }
 
-        if (currentStewMealId && !usedMealIds.has(currentStewMealId)) {
-          daysCopy[di].mealId = currentStewMealId;
-          usedMealIds.add(currentStewMealId);
-        } else if (currentStewMealId && usedMealIds.has(currentStewMealId) && prevSlot) {
-          daysCopy[di].mealId = currentStewMealId;
-        } else {
+        const emptySlots: number[] = [];
+        for (let di = wStart; di < wEnd; di++) {
+          if (!fixedDays.has(di) && !days[di].mealId) emptySlots.push(di);
+        }
+
+        const needed = Math.max(0, rule.minCount - fixedCount);
+        const canAdd = Math.max(0, maxCount - fixedCount);
+
+        if (needed > emptySlots.length) {
           success = false;
           break;
         }
+
+        const pool = shuffle(
+          meals.filter(
+            (m) =>
+              m.categoryId === rule.categoryId &&
+              !recentMealIds.has(m.id) &&
+              !usedMealIds.has(m.id)
+          )
+        );
+
+        if (pool.length < needed) {
+          success = false;
+          break;
+        }
+
+        const maxAddable = Math.min(canAdd, emptySlots.length, pool.length);
+        const count = needed + (maxAddable > needed
+          ? Math.floor(Math.random() * (maxAddable - needed + 1))
+          : 0);
+
+        shuffle([...emptySlots])
+          .slice(0, count)
+          .forEach((slot, i) => {
+            days[slot].mealId = pool[i].id;
+            usedMealIds.add(pool[i].id);
+          });
       }
+
+      if (!success) break;
     }
 
     if (!success) continue;
 
+    // Fill remaining empty days
     for (let di = 0; di < numDays; di++) {
-      if (daysCopy[di].mealId) continue;
+      if (fixedDays.has(di) || days[di].mealId) continue;
 
-      const pool = shuffle(availableMeals(recentMealIds));
-      if (pool.length === 0) {
+      const recentCats =
+        noRepeatMealCatRule?.enabled
+          ? getRecentMealCategories(days, meals, di, noRepeatMealCatRule.windowDays)
+          : new Set<string>();
+
+      const basePool = meals.filter(
+        (m) => !recentMealIds.has(m.id) && !usedMealIds.has(m.id)
+      );
+      const filtered = noRepeatMealCatRule?.enabled
+        ? basePool.filter((m) => !recentCats.has(m.categoryId))
+        : basePool;
+
+      // Fall back to unfiltered if no meals satisfy the category-repeat rule
+      const meal = shuffle(filtered.length > 0 ? filtered : basePool)[0];
+
+      if (!meal) {
         success = false;
         break;
       }
 
-      daysCopy[di].mealId = pool[0].id;
-      usedMealIds.add(pool[0].id);
+      days[di].mealId = meal.id;
+      usedMealIds.add(meal.id);
     }
 
     if (!success) continue;
 
+    // Pick sides for non-fixed days
     for (let di = 0; di < numDays; di++) {
-      const meal = meals.find((m) => m.id === daysCopy[di].mealId);
+      if (fixedDays.has(di)) continue;
+      const meal = meals.find((m) => m.id === days[di].mealId);
       if (!meal) continue;
-
-      const side = pickSide(meal, sides, daysCopy, di, noRepeatRule);
-      daysCopy[di].sideId = side?.id ?? '';
+      days[di].sideId = pickSide(meal, sides, days, di, noRepeatSideRule)?.id ?? '';
     }
 
-    return {
-      id: generateId('plan'),
-      name,
-      startDate,
-      days: daysCopy,
-      createdAt: new Date().toISOString(),
-    };
+    return days;
   }
 
   return null;
+}
+
+function extractRules(data: AppData) {
+  const { rules } = data;
+  const noRepeatSideRule =
+    (rules.find(
+      (r) => r.type === 'no_repeat_side_category' && r.enabled
+    ) as NoRepeatSideCategoryRule | undefined) ?? null;
+  const noRepeatMealCatRule =
+    (rules.find(
+      (r) => r.type === 'no_repeat_meal_category' && r.enabled
+    ) as NoRepeatMealCategoryRule | undefined) ?? null;
+  const noRecentRule = rules.find((r) => r.type === 'no_recent_meals' && r.enabled);
+  const recentDays =
+    noRecentRule?.type === 'no_recent_meals' ? noRecentRule.recentDays : 0;
+  const recentMealIds =
+    recentDays > 0 ? getRecentMealIds(data, recentDays) : new Set<string>();
+  const requiredRules = rules.filter(
+    (r) => r.type === 'required_category' && r.enabled
+  ) as RequiredCategoryRule[];
+  return { noRepeatSideRule, noRepeatMealCatRule, recentMealIds, requiredRules };
+}
+
+export function generatePlan(data: AppData, name: string, startDate: string): Plan | null {
+  const numDays = data.settings.planDurationDays;
+  const { noRepeatSideRule, noRepeatMealCatRule, recentMealIds, requiredRules } =
+    extractRules(data);
+
+  const result = buildDays(
+    data,
+    numDays,
+    new Map(),
+    recentMealIds,
+    noRepeatSideRule,
+    noRepeatMealCatRule,
+    requiredRules
+  );
+  if (!result) return null;
+
+  const days = result.map((d, i) => {
+    const date = new Date(startDate);
+    date.setDate(date.getDate() + i);
+    return { ...d, date: date.toISOString().slice(0, 10) };
+  });
+
+  return {
+    id: generateId('plan'),
+    name,
+    startDate,
+    days,
+    createdAt: new Date().toISOString(),
+  };
+}
+
+export function regenerateDays(
+  data: AppData,
+  plan: Plan,
+  indicesToRegenerate: number[]
+): Plan | null {
+  const { noRepeatSideRule, noRepeatMealCatRule, recentMealIds, requiredRules } =
+    extractRules(data);
+
+  const regenerateSet = new Set(indicesToRegenerate);
+  const numDays = plan.days.length;
+
+  const fixedDays = new Map<number, PlanDay>();
+  for (let i = 0; i < numDays; i++) {
+    if (!regenerateSet.has(i)) fixedDays.set(i, plan.days[i]);
+  }
+
+  const result = buildDays(
+    data,
+    numDays,
+    fixedDays,
+    recentMealIds,
+    noRepeatSideRule,
+    noRepeatMealCatRule,
+    requiredRules
+  );
+  if (!result) return null;
+
+  const days = result.map((d, i) => ({
+    ...d,
+    date: plan.days[i].date,
+    notes: d.notes || plan.days[i].notes,
+  }));
+
+  return { ...plan, days };
 }
