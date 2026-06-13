@@ -129,7 +129,7 @@ export default function Categories() {
       <div className="space-y-4">
         <CategorySection
           title="Kategorije jela"
-          items={data.mealCategories}
+          items={[...data.mealCategories].sort((a, b) => a.name.localeCompare(b.name, 'hr'))}
           onAdd={addMealCat}
           onEdit={editMealCat}
           onDelete={deleteMealCat}
@@ -137,7 +137,7 @@ export default function Categories() {
         />
         <CategorySection
           title="Kategorije dodataka"
-          items={data.sideCategories}
+          items={[...data.sideCategories].sort((a, b) => a.name.localeCompare(b.name, 'hr'))}
           onAdd={addSideCat}
           onEdit={editSideCat}
           onDelete={deleteSideCat}

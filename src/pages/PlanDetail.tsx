@@ -240,7 +240,7 @@ export default function PlanDetail() {
                         <div className="space-y-3 mt-3">
                           {meal && (
                             <div>
-                              <p className="text-xs font-semibold text-gray-500 mb-1.5">Sastojci jela:</p>
+                              <p className="text-xs font-semibold text-gray-500 mb-1.5">Namirnice jela:</p>
                               <ul className="text-sm text-gray-600 space-y-1">
                                 {meal.ingredients.map((ing, i) => (
                                   <li key={i} className="flex justify-between">
@@ -259,7 +259,7 @@ export default function PlanDetail() {
                           )}
                           {side && side.ingredients.length > 0 && (
                             <div>
-                              <p className="text-xs font-semibold text-gray-500 mb-1.5">Sastojci dodatka:</p>
+                              <p className="text-xs font-semibold text-gray-500 mb-1.5">Namirnice dodatka:</p>
                               <ul className="text-sm text-gray-600 space-y-1">
                                 {side.ingredients.map((ing, i) => (
                                   <li key={i} className="flex justify-between">
@@ -300,7 +300,7 @@ export default function PlanDetail() {
           <div className="bg-white rounded-xl border overflow-hidden mb-3">
             <div className="bg-amber-50 px-4 py-3 border-b">
               <p className="font-semibold text-amber-800 text-sm">
-                Sastojci za plan
+                Namirnice za plan
                 {shopping && shopping.items.length > 0 && (
                   <span className="ml-2 text-amber-600 font-normal text-xs">
                     {checkedCount}/{shopping.items.length} označeno
@@ -311,8 +311,8 @@ export default function PlanDetail() {
             {!shopping || shopping.items.length === 0 ? (
               <div className="text-center py-8 text-sm text-gray-400">
                 <UtensilsCrossed size={28} className="mx-auto mb-2 opacity-30" />
-                <p>Nema sastojaka</p>
-                <p className="text-xs">Dodajte sastojke jelima i dodacima</p>
+                <p>Nema namirnica</p>
+                <p className="text-xs">Dodajte namirnice jelima i dodacima</p>
               </div>
             ) : (
               <ul>
@@ -345,7 +345,7 @@ export default function PlanDetail() {
           <div className="bg-white rounded-xl border overflow-hidden">
             <div className="bg-yellow-50 px-4 py-3 border-b">
               <p className="font-semibold text-yellow-800 text-sm">
-                ⭐ Zajednički sastojci
+                ⭐ Stalne namirnice
                 <span className="ml-2 text-yellow-600 font-normal text-xs">
                   {commonCheckedCount}/{data.ingredients.filter(i => i.isCommon).length} označeno
                 </span>

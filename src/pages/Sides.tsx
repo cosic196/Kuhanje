@@ -44,6 +44,8 @@ export default function Sides() {
   const getCategoryName = (id: string) =>
     data.sideCategories.find((c) => c.id === id)?.name ?? 'Ostalo';
 
+  const sortedSides = [...data.sides].sort((a, b) => a.name.localeCompare(b.name, 'hr'));
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -64,7 +66,7 @@ export default function Sides() {
         </div>
       ) : (
         <div className="space-y-2">
-          {data.sides.map((s) => (
+          {sortedSides.map((s) => (
             <div key={s.id} className="bg-white rounded-xl border p-4">
               <div className="flex items-center gap-3">
                 <div className="flex-1 min-w-0">
@@ -74,7 +76,7 @@ export default function Sides() {
                       {getCategoryName(s.categoryId)}
                     </span>
                     {s.ingredients.length > 0 && (
-                      <span className="text-xs text-gray-400">{s.ingredients.length} sast.</span>
+                      <span className="text-xs text-gray-400">{s.ingredients.length} nam.</span>
                     )}
                   </div>
                 </div>
@@ -118,7 +120,7 @@ export default function Sides() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Sastojci</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Namirnice</label>
               <IngredientEditor
                 items={form.ingredients}
                 onChange={(items) => setForm({ ...form, ingredients: items })}

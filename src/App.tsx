@@ -20,7 +20,7 @@ export default function App() {
             <Route path="jela" element={<Meals />} />
             <Route path="dodaci" element={<Sides />} />
             <Route path="kategorije" element={<Categories />} />
-            <Route path="sastojci" element={<Ingredients />} />
+            <Route path="namirnice" element={<Ingredients />} />
             <Route path="pravila" element={<Rules />} />
           </Route>
         </Routes>

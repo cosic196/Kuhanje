@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, Search, ChefHat } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, ChefHat, Check, X } from 'lucide-react';
 import { useApp } from '../AppContext';
 import Modal from '../components/Modal';
 import IngredientEditor from '../components/IngredientEditor';
@@ -21,17 +21,39 @@ export default function Meals() {
   const [isNew, setIsNew] = useState(false);
   const [form, setForm] = useState(empty());
 
-  const filtered = data.meals.filter((m) =>
+  // inline category creation
+  const [showNewCat, setShowNewCat] = useState(false);
+  const [newCatName, setNewCatName] = useState('');
+
+  // inline side creation
+  const [showNewSide, setShowNewSide] = useState(false);
+  const [newSideName, setNewSideName] = useState('');
+  const [newSideCatId, setNewSideCatId] = useState('sc_ostalo');
+
+  const sortedMeals = [...data.meals].sort((a, b) => a.name.localeCompare(b.name, 'hr'));
+  const filtered = sortedMeals.filter((m) =>
     m.name.toLowerCase().includes(search.toLowerCase())
   );
+  const sortedCategories = [...data.mealCategories].sort((a, b) => a.name.localeCompare(b.name, 'hr'));
+  const sortedSideCategories = [...data.sideCategories].sort((a, b) => a.name.localeCompare(b.name, 'hr'));
+  const sortedSides = [...data.sides].sort((a, b) => a.name.localeCompare(b.name, 'hr'));
 
-  const openNew = () => { setForm(empty()); setEditing(null); setIsNew(true); };
+  const resetInline = () => {
+    setShowNewCat(false);
+    setNewCatName('');
+    setShowNewSide(false);
+    setNewSideName('');
+    setNewSideCatId('sc_ostalo');
+  };
+
+  const openNew = () => { setForm(empty()); setEditing(null); setIsNew(true); resetInline(); };
   const openEdit = (m: Meal) => {
     setForm({ name: m.name, ingredients: m.ingredients, categoryId: m.categoryId, possibleSideIds: m.possibleSideIds, recipe: m.recipe });
     setEditing(m);
     setIsNew(false);
+    resetInline();
   };
-  const close = () => { setEditing(null); setIsNew(false); };
+  const close = () => { setEditing(null); setIsNew(false); resetInline(); };
 
   const save = () => {
     if (!form.name.trim()) return;
@@ -54,6 +76,30 @@ export default function Meals() {
         ? f.possibleSideIds.filter((s) => s !== sideId)
         : [...f.possibleSideIds, sideId],
     }));
+  };
+
+  const createCategory = () => {
+    if (!newCatName.trim()) return;
+    const id = generateId('mc');
+    setData((prev) => ({
+      ...prev,
+      mealCategories: [...prev.mealCategories, { id, name: newCatName.trim() }],
+    }));
+    setForm((f) => ({ ...f, categoryId: id }));
+    setNewCatName('');
+    setShowNewCat(false);
+  };
+
+  const createSide = () => {
+    if (!newSideName.trim()) return;
+    const id = generateId('side');
+    setData((prev) => ({
+      ...prev,
+      sides: [...prev.sides, { id, name: newSideName.trim(), ingredients: [], categoryId: newSideCatId, recipe: '' }],
+    }));
+    setForm((f) => ({ ...f, possibleSideIds: [...f.possibleSideIds, id] }));
+    setNewSideName('');
+    setShowNewSide(false);
   };
 
   const getCategoryName = (id: string) =>
@@ -99,7 +145,7 @@ export default function Meals() {
                       {getCategoryName(m.categoryId)}
                     </span>
                     {m.ingredients.length > 0 && (
-                      <span className="text-xs text-gray-400">{m.ingredients.length} sast.</span>
+                      <span className="text-xs text-gray-400">{m.ingredients.length} nam.</span>
                     )}
                     {m.possibleSideIds.length > 0 && (
                       <span className="text-xs text-gray-400">{m.possibleSideIds.length} dod.</span>
@@ -133,32 +179,71 @@ export default function Meals() {
                 autoFocus
               />
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Kategorija</label>
-              <select
-                className="w-full border rounded-xl px-4 py-3"
-                value={form.categoryId}
-                onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-              >
-                {data.mealCategories.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
+              <div className="flex gap-2">
+                <select
+                  className="flex-1 border rounded-xl px-4 py-3"
+                  value={form.categoryId}
+                  onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+                >
+                  {sortedCategories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+                {!showNewCat && (
+                  <button
+                    type="button"
+                    onClick={() => setShowNewCat(true)}
+                    className="px-3 py-2.5 border rounded-xl text-amber-600 hover:bg-amber-50 text-sm font-medium flex items-center gap-1 flex-shrink-0"
+                  >
+                    <Plus size={14} /> Nova
+                  </button>
+                )}
+              </div>
+              {showNewCat && (
+                <div className="flex gap-2 mt-2">
+                  <input
+                    className="flex-1 border rounded-xl px-3 py-2.5 text-sm"
+                    placeholder="Naziv kategorije..."
+                    value={newCatName}
+                    onChange={(e) => setNewCatName(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') createCategory(); if (e.key === 'Escape') { setShowNewCat(false); setNewCatName(''); } }}
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={createCategory}
+                    disabled={!newCatName.trim()}
+                    className="p-2.5 bg-amber-600 text-white rounded-xl disabled:opacity-40 flex-shrink-0"
+                  >
+                    <Check size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowNewCat(false); setNewCatName(''); }}
+                    className="p-2.5 border rounded-xl text-gray-500 flex-shrink-0"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              )}
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Sastojci</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Namirnice</label>
               <IngredientEditor
                 items={form.ingredients}
                 onChange={(items) => setForm({ ...form, ingredients: items })}
               />
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Mogući dodaci</label>
-              {data.sides.length === 0 ? (
-                <p className="text-sm text-gray-400 py-2">Nema dodanih dodataka.</p>
-              ) : (
-                <div className="grid grid-cols-2 gap-2 max-h-44 overflow-y-auto border rounded-xl p-3">
-                  {data.sides.map((side) => (
+              {sortedSides.length > 0 && (
+                <div className="grid grid-cols-2 gap-2 max-h-44 overflow-y-auto border rounded-xl p-3 mb-2">
+                  {sortedSides.map((side) => (
                     <label key={side.id} className="flex items-center gap-2 text-sm cursor-pointer py-1">
                       <input
                         type="checkbox"
@@ -171,7 +256,58 @@ export default function Meals() {
                   ))}
                 </div>
               )}
+              {sortedSides.length === 0 && !showNewSide && (
+                <p className="text-sm text-gray-400 mb-2">Nema dodanih dodataka.</p>
+              )}
+              {showNewSide ? (
+                <div className="border rounded-xl p-3 bg-amber-50 space-y-2">
+                  <p className="text-xs font-semibold text-gray-600">Novi dodatak</p>
+                  <input
+                    className="w-full border rounded-xl px-3 py-2.5 text-sm bg-white"
+                    placeholder="Naziv dodatka (npr. Tjestenina)..."
+                    value={newSideName}
+                    onChange={(e) => setNewSideName(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') createSide(); if (e.key === 'Escape') { setShowNewSide(false); setNewSideName(''); } }}
+                    autoFocus
+                  />
+                  <select
+                    className="w-full border rounded-xl px-3 py-2.5 text-sm bg-white"
+                    value={newSideCatId}
+                    onChange={(e) => setNewSideCatId(e.target.value)}
+                  >
+                    {sortedSideCategories.map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={createSide}
+                      disabled={!newSideName.trim()}
+                      className="flex-1 bg-amber-600 text-white py-2.5 rounded-xl text-sm font-medium disabled:opacity-40 active:scale-95 transition-transform"
+                    >
+                      Dodaj i označi
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowNewSide(false); setNewSideName(''); }}
+                      className="px-4 border rounded-xl text-gray-600 text-sm"
+                    >
+                      Otkaži
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowNewSide(true)}
+                  className="flex items-center gap-1.5 text-sm text-amber-600 hover:text-amber-800 py-1"
+                >
+                  <Plus size={14} /> Dodaj novi dodatak
+                </button>
+              )}
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Recept</label>
               <textarea

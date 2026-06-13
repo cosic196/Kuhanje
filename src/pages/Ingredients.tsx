@@ -13,9 +13,9 @@ export default function Ingredients() {
   const [editIsCommon, setEditIsCommon] = useState(false);
   const [search, setSearch] = useState('');
 
-  const filtered = data.ingredients.filter((i) =>
-    i.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = [...data.ingredients]
+    .filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => a.name.localeCompare(b.name, 'hr'));
 
   const common = filtered.filter((i) => i.isCommon);
   const notCommon = filtered.filter((i) => !i.isCommon);
@@ -55,7 +55,7 @@ export default function Ingredients() {
     <div className="mb-4">
       <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 px-1">{label}</p>
       {items.length === 0 ? (
-        <p className="text-sm text-gray-400 px-1 py-2">Nema sastojaka.</p>
+        <p className="text-sm text-gray-400 px-1 py-2">Nema namirnica.</p>
       ) : (
         <div className="space-y-1.5">
           {items.map((ing) =>
@@ -75,7 +75,7 @@ export default function Ingredients() {
                     onChange={(e) => setEditIsCommon(e.target.checked)}
                     className="accent-amber-600 w-4 h-4"
                   />
-                  Zajedn.
+                  Stalna
                 </label>
                 <button onClick={saveEdit} className="p-2.5 bg-amber-600 text-white rounded-xl flex-shrink-0">
                   <Check size={15} />
@@ -112,16 +112,16 @@ export default function Ingredients() {
   return (
     <div>
       <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4">
-        <ShoppingBasket className="text-amber-600" size={22} /> Sastojci
+        <ShoppingBasket className="text-amber-600" size={22} /> Namirnice
       </h1>
 
       {/* Add new */}
       <div className="bg-white rounded-xl border p-4 mb-4">
-        <p className="text-sm font-semibold text-gray-700 mb-3">Dodaj novi sastojak</p>
+        <p className="text-sm font-semibold text-gray-700 mb-3">Dodaj novu namirnicu</p>
         <div className="flex gap-2 mb-2">
           <input
             className="flex-1 border rounded-xl px-4 py-3 text-sm"
-            placeholder="Naziv sastojka..."
+            placeholder="Naziv namirnice..."
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') add(); }}
@@ -142,7 +142,7 @@ export default function Ingredients() {
             className="accent-amber-600 w-4 h-4"
           />
           <Star size={14} className="text-amber-500" />
-          Zajednički sastojak (sol, ulje, šećer...)
+          Stalna namirnica (sol, ulje, šećer...)
         </label>
       </div>
 
@@ -150,12 +150,12 @@ export default function Ingredients() {
       <div className="bg-white rounded-xl border p-4">
         <input
           className="w-full border rounded-xl px-4 py-3 text-sm mb-4"
-          placeholder="Pretraži sastojke..."
+          placeholder="Pretraži namirnice..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        {renderList(common, '⭐ Zajednički sastojci')}
-        {renderList(notCommon, 'Ostali sastojci')}
+        {renderList(common, '⭐ Stalne namirnice')}
+        {renderList(notCommon, 'Ostale namirnice')}
       </div>
     </div>
   );

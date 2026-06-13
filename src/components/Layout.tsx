@@ -9,7 +9,7 @@ const links = [
   { to: '/jela', label: 'Jela', icon: UtensilsCrossed },
   { to: '/dodaci', label: 'Dodaci', icon: Layers },
   { to: '/kategorije', label: 'Kategorije', icon: Tag },
-  { to: '/sastojci', label: 'Sastojci', icon: ShoppingBasket },
+  { to: '/namirnice', label: 'Namirnice', icon: ShoppingBasket },
   { to: '/pravila', label: 'Pravila', icon: Settings },
 ];
 
