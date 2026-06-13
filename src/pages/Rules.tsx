@@ -142,12 +142,12 @@ export default function Rules() {
     const cats = form.categoryType === 'meal' ? data.mealCategories : data.sideCategories;
     const maxCount = form.maxCount ?? form.minCount;
     return (
-      <div className="space-y-3 bg-amber-50 rounded-xl p-4 border border-amber-100">
+      <div className="space-y-3 bg-amber-50 dark:bg-amber-950/50 rounded-xl p-4 border border-amber-100 dark:border-amber-800">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-gray-500 block mb-1">{t.rules.typeLabel}</label>
+            <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1">{t.rules.typeLabel}</label>
             <select
-              className="w-full border rounded-xl px-3 py-2.5 text-sm bg-white"
+              className="w-full border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
               value={form.categoryType}
               onChange={(e) =>
                 setForm({ ...form, categoryType: e.target.value as 'meal' | 'side', categoryId: '' })
@@ -158,9 +158,9 @@ export default function Rules() {
             </select>
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">{t.rules.catLabel}</label>
+            <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1">{t.rules.catLabel}</label>
             <select
-              className="w-full border rounded-xl px-3 py-2.5 text-sm bg-white"
+              className="w-full border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
               value={form.categoryId}
               onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
             >
@@ -173,12 +173,12 @@ export default function Rules() {
             </select>
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">{t.rules.minLabel}</label>
+            <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1">{t.rules.minLabel}</label>
             <input
               type="number"
               min={1}
               max={7}
-              className="w-full border rounded-xl px-3 py-2.5 text-sm bg-white"
+              className="w-full border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
               value={form.minCount}
               onChange={(e) => {
                 const val = Number(e.target.value);
@@ -187,23 +187,23 @@ export default function Rules() {
             />
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">{t.rules.maxLabel}</label>
+            <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1">{t.rules.maxLabel}</label>
             <input
               type="number"
               min={form.minCount}
               max={7}
-              className="w-full border rounded-xl px-3 py-2.5 text-sm bg-white"
+              className="w-full border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
               value={maxCount}
               onChange={(e) => setForm({ ...form, maxCount: Math.max(form.minCount, Number(e.target.value)) })}
             />
           </div>
           <div className="col-span-2">
-            <label className="text-xs text-gray-500 block mb-1">{t.rules.everyNLabel}</label>
+            <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1">{t.rules.everyNLabel}</label>
             <input
               type="number"
               min={1}
               max={14}
-              className="w-full border rounded-xl px-3 py-2.5 text-sm bg-white"
+              className="w-full border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
               value={form.everyNDays}
               onChange={(e) => setForm({ ...form, everyNDays: Number(e.target.value) })}
             />
@@ -219,7 +219,7 @@ export default function Rules() {
           </button>
           <button
             onClick={cancelEdit}
-            className="flex-1 border py-3 rounded-xl text-sm font-medium text-gray-600 flex items-center justify-center gap-1.5"
+            className="flex-1 border dark:border-gray-600 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center justify-center gap-1.5"
           >
             <X size={16} /> {t.rules.cancelBtn}
           </button>
@@ -230,21 +230,21 @@ export default function Rules() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4">
+      <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
         <Settings className="text-amber-600" size={22} /> {t.rules.title}
       </h1>
 
       {/* Plan settings */}
-      <div className="bg-white rounded-xl border p-4 mb-4">
-        <p className="font-semibold text-gray-700 mb-3 text-sm">{t.rules.planSettings}</p>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4 mb-4">
+        <p className="font-semibold text-gray-700 dark:text-gray-200 mb-3 text-sm">{t.rules.planSettings}</p>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-gray-500 block mb-1.5">{t.rules.durationLabel}</label>
+            <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1.5">{t.rules.durationLabel}</label>
             <input
               type="number"
               min={1}
               max={14}
-              className="w-full border rounded-xl px-3 py-2.5 text-sm"
+              className="w-full border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
               value={data.settings.planDurationDays}
               onChange={(e) =>
                 setData((p) => ({
@@ -255,12 +255,12 @@ export default function Rules() {
             />
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1.5">{t.rules.noRepeatLabel}</label>
+            <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1.5">{t.rules.noRepeatLabel}</label>
             <input
               type="number"
               min={1}
               max={14}
-              className="w-full border rounded-xl px-3 py-2.5 text-sm"
+              className="w-full border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
               value={data.settings.noRepeatWithinPlanDays}
               onChange={(e) =>
                 setData((p) => ({
@@ -274,9 +274,9 @@ export default function Rules() {
       </div>
 
       {/* No repeat side category rule */}
-      <div className={`bg-white rounded-xl border p-4 mb-3 ${!noRepeatSideRule.enabled ? 'opacity-60' : ''}`}>
+      <div className={`bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4 mb-3 ${!noRepeatSideRule.enabled ? 'opacity-60' : ''}`}>
         <div className="flex items-center justify-between mb-1">
-          <p className="font-semibold text-gray-800 text-sm">{t.rules.noRepeatSideTitle}</p>
+          <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm">{t.rules.noRepeatSideTitle}</p>
           <button
             onClick={() => updateSingletonRule({ ...noRepeatSideRule, enabled: !noRepeatSideRule.enabled })}
             className="text-amber-600 flex-shrink-0"
@@ -284,19 +284,19 @@ export default function Rules() {
             {noRepeatSideRule.enabled ? (
               <ToggleRight size={28} />
             ) : (
-              <ToggleLeft size={28} className="text-gray-300" />
+              <ToggleLeft size={28} className="text-gray-300 dark:text-gray-600" />
             )}
           </button>
         </div>
-        <p className="text-xs text-gray-400 mb-3">{t.rules.noRepeatSideDesc}</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">{t.rules.noRepeatSideDesc}</p>
         {noRepeatSideRule.enabled && (
           <div className="flex items-center gap-3">
-            <label className="text-sm text-gray-600">{t.rules.windowDaysLabel}</label>
+            <label className="text-sm text-gray-600 dark:text-gray-300">{t.rules.windowDaysLabel}</label>
             <input
               type="number"
               min={2}
               max={14}
-              className="w-20 border rounded-xl px-3 py-2 text-sm"
+              className="w-20 border dark:border-gray-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
               value={noRepeatSideRule.windowDays}
               onChange={(e) =>
                 updateSingletonRule({ ...noRepeatSideRule, windowDays: Math.min(14, Math.max(2, Number(e.target.value))) })
@@ -307,9 +307,9 @@ export default function Rules() {
       </div>
 
       {/* No repeat meal category rule */}
-      <div className={`bg-white rounded-xl border p-4 mb-3 ${!noRepeatMealRule.enabled ? 'opacity-60' : ''}`}>
+      <div className={`bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4 mb-3 ${!noRepeatMealRule.enabled ? 'opacity-60' : ''}`}>
         <div className="flex items-center justify-between mb-1">
-          <p className="font-semibold text-gray-800 text-sm">{t.rules.noRepeatMealTitle}</p>
+          <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm">{t.rules.noRepeatMealTitle}</p>
           <button
             onClick={() => updateSingletonRule({ ...noRepeatMealRule, enabled: !noRepeatMealRule.enabled })}
             className="text-amber-600 flex-shrink-0"
@@ -317,19 +317,19 @@ export default function Rules() {
             {noRepeatMealRule.enabled ? (
               <ToggleRight size={28} />
             ) : (
-              <ToggleLeft size={28} className="text-gray-300" />
+              <ToggleLeft size={28} className="text-gray-300 dark:text-gray-600" />
             )}
           </button>
         </div>
-        <p className="text-xs text-gray-400 mb-3">{t.rules.noRepeatMealDesc}</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">{t.rules.noRepeatMealDesc}</p>
         {noRepeatMealRule.enabled && (
           <div className="flex items-center gap-3">
-            <label className="text-sm text-gray-600">{t.rules.windowDaysLabel}</label>
+            <label className="text-sm text-gray-600 dark:text-gray-300">{t.rules.windowDaysLabel}</label>
             <input
               type="number"
               min={2}
               max={14}
-              className="w-20 border rounded-xl px-3 py-2 text-sm"
+              className="w-20 border dark:border-gray-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
               value={noRepeatMealRule.windowDays}
               onChange={(e) =>
                 updateSingletonRule({ ...noRepeatMealRule, windowDays: Math.min(14, Math.max(2, Number(e.target.value))) })
@@ -340,9 +340,9 @@ export default function Rules() {
       </div>
 
       {/* No recent meals rule */}
-      <div className={`bg-white rounded-xl border p-4 mb-4 ${!noRecentRule.enabled ? 'opacity-60' : ''}`}>
+      <div className={`bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4 mb-4 ${!noRecentRule.enabled ? 'opacity-60' : ''}`}>
         <div className="flex items-center justify-between mb-1">
-          <p className="font-semibold text-gray-800 text-sm">{t.rules.noRecentTitle}</p>
+          <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm">{t.rules.noRecentTitle}</p>
           <button
             onClick={() => updateSingletonRule({ ...noRecentRule, enabled: !noRecentRule.enabled })}
             className="text-amber-600 flex-shrink-0"
@@ -350,19 +350,19 @@ export default function Rules() {
             {noRecentRule.enabled ? (
               <ToggleRight size={28} />
             ) : (
-              <ToggleLeft size={28} className="text-gray-300" />
+              <ToggleLeft size={28} className="text-gray-300 dark:text-gray-600" />
             )}
           </button>
         </div>
-        <p className="text-xs text-gray-400 mb-3">{t.rules.noRecentDesc}</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">{t.rules.noRecentDesc}</p>
         {noRecentRule.enabled && (
           <div className="flex items-center gap-3">
-            <label className="text-sm text-gray-600">{t.rules.recentDaysLabel}</label>
+            <label className="text-sm text-gray-600 dark:text-gray-300">{t.rules.recentDaysLabel}</label>
             <input
               type="number"
               min={1}
               max={14}
-              className="w-20 border rounded-xl px-3 py-2 text-sm"
+              className="w-20 border dark:border-gray-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
               value={noRecentRule.recentDays}
               onChange={(e) =>
                 updateSingletonRule({ ...noRecentRule, recentDays: Math.min(14, Math.max(1, Number(e.target.value))) })
@@ -373,9 +373,9 @@ export default function Rules() {
       </div>
 
       {/* Required categories */}
-      <div className="bg-white rounded-xl border p-4 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4 mb-4">
         <div className="flex items-center justify-between mb-3">
-          <p className="font-semibold text-gray-800 text-sm">{t.rules.requiredTitle}</p>
+          <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm">{t.rules.requiredTitle}</p>
           {!addingNew && editingId === null && (
             <button
               onClick={startAdd}
@@ -387,7 +387,7 @@ export default function Rules() {
         </div>
 
         {requiredRules.length === 0 && !addingNew && (
-          <p className="text-sm text-gray-400 py-2">{t.rules.noRequired}</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 py-2">{t.rules.noRequired}</p>
         )}
 
         <div className="space-y-3">
@@ -397,21 +397,21 @@ export default function Rules() {
                 <FormFields />
               ) : (
                 <div
-                  className={`flex items-start justify-between gap-2 rounded-xl border px-4 py-3 ${
+                  className={`flex items-start justify-between gap-2 rounded-xl border dark:border-gray-600 px-4 py-3 ${
                     !rule.enabled ? 'opacity-60' : ''
                   }`}
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-medium text-gray-800">{getCategoryName(rule)}</span>
-                      <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-100">{getCategoryName(rule)}</span>
+                      <span className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
                         {rule.categoryType === 'meal' ? t.rules.mealType : t.rules.sideType}
                       </span>
                       {!rule.enabled && (
-                        <span className="text-xs text-gray-400 italic">{t.rules.disabled}</span>
+                        <span className="text-xs text-gray-400 dark:text-gray-500 italic">{t.rules.disabled}</span>
                       )}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {rule.minCount === (rule.maxCount ?? rule.minCount)
                         ? t.rules.timesExact(rule.minCount)
                         : t.rules.timesRange(rule.minCount, rule.maxCount ?? rule.minCount)}{' '}
@@ -433,18 +433,18 @@ export default function Rules() {
                       {rule.enabled ? (
                         <ToggleRight size={22} />
                       ) : (
-                        <ToggleLeft size={22} className="text-gray-300" />
+                        <ToggleLeft size={22} className="text-gray-300 dark:text-gray-600" />
                       )}
                     </button>
                     <button
                       onClick={() => startEdit(rule)}
-                      className="p-2.5 text-gray-400 hover:text-amber-600 rounded-lg active:bg-amber-50"
+                      className="p-2.5 text-gray-400 dark:text-gray-500 hover:text-amber-600 rounded-lg active:bg-amber-50 dark:active:bg-amber-900/30"
                     >
                       <Pencil size={15} />
                     </button>
                     <button
                       onClick={() => deleteRequired(rule.id)}
-                      className="p-2.5 text-gray-400 hover:text-red-500 rounded-lg active:bg-red-50"
+                      className="p-2.5 text-gray-400 dark:text-gray-500 hover:text-red-500 rounded-lg active:bg-red-50 dark:active:bg-red-950/30"
                     >
                       <Trash2 size={15} />
                     </button>
@@ -459,8 +459,8 @@ export default function Rules() {
       </div>
 
       {/* Export / Import */}
-      <div className="bg-white rounded-xl border p-4">
-        <p className="font-semibold text-gray-700 mb-3 text-sm">{t.rules.exportImport}</p>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4">
+        <p className="font-semibold text-gray-700 dark:text-gray-200 mb-3 text-sm">{t.rules.exportImport}</p>
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={handleExport}
@@ -468,12 +468,12 @@ export default function Rules() {
           >
             <Download size={16} /> {t.rules.exportBtn}
           </button>
-          <label className="flex items-center gap-2 px-4 py-3 border rounded-xl hover:bg-gray-50 text-sm cursor-pointer active:scale-95 transition-transform">
+          <label className="flex items-center gap-2 px-4 py-3 border dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 text-sm cursor-pointer active:scale-95 transition-transform text-gray-700 dark:text-gray-200">
             <Upload size={16} /> {t.rules.importBtn}
             <input type="file" accept=".json" className="hidden" onChange={handleImport} />
           </label>
         </div>
-        <p className="text-xs text-gray-400 mt-2">{t.rules.dataNote}</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{t.rules.dataNote}</p>
       </div>
     </div>
   );

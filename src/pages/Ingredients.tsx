@@ -55,21 +55,21 @@ export default function Ingredients() {
 
   const renderList = (items: typeof filtered, label: string) => (
     <div className="mb-4">
-      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2 px-1">{label}</p>
+      <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-2 px-1">{label}</p>
       {items.length === 0 ? (
-        <p className="text-sm text-gray-400 px-1 py-2">{t.ingredients.noIngredients}</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 px-1 py-2">{t.ingredients.noIngredients}</p>
       ) : (
         <div className="space-y-1.5">
           {items.map((ing) =>
             editId === ing.id ? (
-              <div key={ing.id} className="flex gap-2 items-center bg-amber-50 rounded-xl p-2">
+              <div key={ing.id} className="flex gap-2 items-center bg-amber-50 dark:bg-amber-950/50 rounded-xl p-2">
                 <input
-                  className="flex-1 border rounded-xl px-3 py-2.5 text-sm bg-white"
+                  className="flex-1 border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditId(null); }}
                 />
-                <label className="flex items-center gap-1 text-xs text-gray-600 whitespace-nowrap flex-shrink-0">
+                <label className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300 whitespace-nowrap flex-shrink-0">
                   <input
                     type="checkbox"
                     checked={editIsCommon}
@@ -81,23 +81,23 @@ export default function Ingredients() {
                 <button onClick={saveEdit} className="p-2.5 bg-amber-600 text-white rounded-xl flex-shrink-0">
                   <Check size={15} />
                 </button>
-                <button onClick={() => setEditId(null)} className="p-2.5 border rounded-xl text-gray-500 flex-shrink-0">
+                <button onClick={() => setEditId(null)} className="p-2.5 border dark:border-gray-600 rounded-xl text-gray-500 dark:text-gray-400 flex-shrink-0">
                   <X size={15} />
                 </button>
               </div>
             ) : (
-              <div key={ing.id} className="flex items-center justify-between bg-white rounded-xl border px-4 py-3">
-                <span className="text-sm text-gray-800">{ing.name}</span>
+              <div key={ing.id} className="flex items-center justify-between bg-white dark:bg-gray-700 rounded-xl border dark:border-gray-600 px-4 py-3">
+                <span className="text-sm text-gray-800 dark:text-gray-100">{ing.name}</span>
                 <div className="flex gap-1">
                   <button
                     onClick={() => startEdit(ing)}
-                    className="p-2.5 text-gray-400 hover:text-amber-600 rounded-lg active:bg-amber-50"
+                    className="p-2.5 text-gray-400 dark:text-gray-500 hover:text-amber-600 rounded-lg active:bg-amber-50 dark:active:bg-amber-900/30"
                   >
                     <Pencil size={15} />
                   </button>
                   <button
                     onClick={() => remove(ing.id)}
-                    className="p-2.5 text-gray-400 hover:text-red-500 rounded-lg active:bg-red-50"
+                    className="p-2.5 text-gray-400 dark:text-gray-500 hover:text-red-500 rounded-lg active:bg-red-50 dark:active:bg-red-950/30"
                   >
                     <Trash2 size={15} />
                   </button>
@@ -112,15 +112,15 @@ export default function Ingredients() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4">
+      <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
         <ShoppingBasket className="text-amber-600" size={22} /> {t.ingredients.title}
       </h1>
 
-      <div className="bg-white rounded-xl border p-4 mb-4">
-        <p className="text-sm font-semibold text-gray-700 mb-3">{t.ingredients.addTitle}</p>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4 mb-4">
+        <p className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">{t.ingredients.addTitle}</p>
         <div className="flex gap-2 mb-2">
           <input
-            className="flex-1 border rounded-xl px-4 py-3 text-sm"
+            className="flex-1 border dark:border-gray-600 rounded-xl px-4 py-3 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
             placeholder={t.ingredients.namePlaceholder}
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
@@ -134,7 +134,7 @@ export default function Ingredients() {
             <Plus size={18} />
           </button>
         </div>
-        <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer py-1">
+        <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200 cursor-pointer py-1">
           <input
             type="checkbox"
             checked={newIsCommon}
@@ -146,9 +146,9 @@ export default function Ingredients() {
         </label>
       </div>
 
-      <div className="bg-white rounded-xl border p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4">
         <input
-          className="w-full border rounded-xl px-4 py-3 text-sm mb-4"
+          className="w-full border dark:border-gray-600 rounded-xl px-4 py-3 text-sm mb-4 bg-white dark:bg-gray-700 dark:text-gray-100"
           placeholder={t.ingredients.searchPlaceholder}
           value={search}
           onChange={(e) => setSearch(e.target.value)}

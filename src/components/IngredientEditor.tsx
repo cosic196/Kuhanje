@@ -39,8 +39,8 @@ function IngredientSearch({ value, onSelect }: { value: string; onSelect: (id: s
 
   if (selected) {
     return (
-      <div className="flex items-center gap-1.5 flex-1 border rounded-xl px-3 py-2.5 text-sm bg-white min-w-0">
-        <span className="flex-1 truncate text-gray-800">{selected.name}</span>
+      <div className="flex items-center gap-1.5 flex-1 border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 min-w-0">
+        <span className="flex-1 truncate text-gray-800 dark:text-gray-100">{selected.name}</span>
         <button
           type="button"
           onMouseDown={(e) => e.preventDefault()}
@@ -55,10 +55,10 @@ function IngredientSearch({ value, onSelect }: { value: string; onSelect: (id: s
 
   return (
     <div className="relative flex-1 min-w-0">
-      <div className="flex items-center border rounded-xl px-3 py-2.5 text-sm bg-white gap-1.5 focus-within:ring-2 focus-within:ring-amber-300 focus-within:border-amber-400">
+      <div className="flex items-center border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 gap-1.5 focus-within:ring-2 focus-within:ring-amber-300 focus-within:border-amber-400">
         <Search size={13} className="text-gray-400 flex-shrink-0" />
         <input
-          className="flex-1 outline-none min-w-0 bg-transparent placeholder:text-gray-400"
+          className="flex-1 outline-none min-w-0 bg-transparent placeholder:text-gray-400 dark:text-gray-100"
           placeholder={t.ingredientEditor.searchPlaceholder}
           value={query}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
@@ -68,7 +68,7 @@ function IngredientSearch({ value, onSelect }: { value: string; onSelect: (id: s
         />
       </div>
       {open && (
-        <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-white border rounded-xl shadow-lg max-h-52 overflow-y-auto">
+        <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-xl shadow-lg max-h-52 overflow-y-auto">
           {filtered.length === 0 && !query.trim() && (
             <p className="text-sm text-gray-400 px-3 py-3 text-center">{t.ingredientEditor.emptyMessage}</p>
           )}
@@ -78,7 +78,7 @@ function IngredientSearch({ value, onSelect }: { value: string; onSelect: (id: s
               type="button"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleSelect(ing.id)}
-              className="w-full text-left px-3 py-2.5 text-sm hover:bg-amber-50 hover:text-amber-700 transition-colors"
+              className="w-full text-left px-3 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-amber-50 dark:hover:bg-amber-900/30 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
             >
               {ing.name}
             </button>
@@ -88,7 +88,7 @@ function IngredientSearch({ value, onSelect }: { value: string; onSelect: (id: s
               type="button"
               onMouseDown={(e) => e.preventDefault()}
               onClick={handleCreate}
-              className="w-full text-left px-3 py-2.5 text-sm text-amber-600 hover:bg-amber-50 border-t flex items-center gap-1.5 font-medium"
+              className="w-full text-left px-3 py-2.5 text-sm text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 border-t dark:border-gray-700 flex items-center gap-1.5 font-medium"
             >
               <Plus size={14} /> {t.ingredientEditor.addNewIngredient(query.trim())}
             </button>
@@ -118,13 +118,13 @@ export default function IngredientEditor({ items, onChange }: { items: Ingredien
             onSelect={(id) => update(i, 'ingredientId', id)}
           />
           <input
-            className="w-16 border rounded-xl px-2 py-2.5 text-sm text-center flex-shrink-0"
+            className="w-16 border dark:border-gray-600 rounded-xl px-2 py-2.5 text-sm text-center flex-shrink-0 bg-white dark:bg-gray-700 dark:text-gray-100"
             placeholder={t.ingredientEditor.amountPlaceholder}
             value={item.amount}
             onChange={(e) => update(i, 'amount', e.target.value)}
           />
           <input
-            className="w-14 border rounded-xl px-2 py-2.5 text-sm text-center flex-shrink-0"
+            className="w-14 border dark:border-gray-600 rounded-xl px-2 py-2.5 text-sm text-center flex-shrink-0 bg-white dark:bg-gray-700 dark:text-gray-100"
             placeholder={t.ingredientEditor.unitPlaceholder}
             value={item.unit}
             onChange={(e) => update(i, 'unit', e.target.value)}

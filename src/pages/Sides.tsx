@@ -82,7 +82,7 @@ export default function Sides() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold text-gray-800">{t.sides.title}</h1>
+        <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">{t.sides.title}</h1>
         <button
           onClick={openNew}
           className="flex items-center gap-1.5 bg-amber-600 text-white px-4 py-2.5 rounded-xl font-medium text-sm active:scale-95 transition-transform"
@@ -92,7 +92,7 @@ export default function Sides() {
       </div>
 
       {data.sides.length === 0 ? (
-        <div className="text-center py-20 text-gray-400">
+        <div className="text-center py-20 text-gray-400 dark:text-gray-500">
           <Layers size={48} className="mx-auto mb-3 opacity-20" />
           <p className="font-medium">{t.sides.noSides}</p>
           <p className="text-sm mt-1">{t.sides.noSidesSub}</p>
@@ -114,10 +114,10 @@ export default function Sides() {
                     onClick={() => toggleCat(cat.id)}
                     className="w-full flex items-center gap-2 mb-2 group"
                   >
-                    <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">{cat.name}</span>
-                    <span className="text-xs text-gray-400 font-normal">({items.length})</span>
-                    <div className="flex-1 h-px bg-gray-200" />
-                    <span className="text-gray-400">
+                    <span className="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wide">{cat.name}</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500 font-normal">({items.length})</span>
+                    <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                    <span className="text-gray-400 dark:text-gray-500">
                       {collapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
                     </span>
                   </button>
@@ -126,46 +126,46 @@ export default function Sides() {
                       {items.map((s) => {
                         const expanded = expandedIds.has(s.id);
                         return (
-                          <div key={s.id} className="bg-white rounded-xl border overflow-hidden">
+                          <div key={s.id} className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 overflow-hidden">
                             <div
                               className="flex items-center gap-3 p-4 cursor-pointer select-none"
                               onClick={() => toggleExpand(s.id)}
                             >
                               <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-gray-800 truncate">{s.name}</p>
+                                <p className="font-semibold text-gray-800 dark:text-gray-100 truncate">{s.name}</p>
                                 {s.ingredients.length > 0 && (
-                                  <span className="text-xs text-gray-400 mt-1 block">{t.sides.ingredientCount(s.ingredients.length)}</span>
+                                  <span className="text-xs text-gray-400 dark:text-gray-500 mt-1 block">{t.sides.ingredientCount(s.ingredients.length)}</span>
                                 )}
                               </div>
                               <div className="flex gap-1 flex-shrink-0 items-center">
                                 <button
                                   onClick={(e) => { e.stopPropagation(); openEdit(s); }}
-                                  className="p-2.5 text-gray-400 hover:text-amber-600 rounded-lg active:bg-amber-50"
+                                  className="p-2.5 text-gray-400 dark:text-gray-500 hover:text-amber-600 rounded-lg active:bg-amber-50 dark:active:bg-amber-900/30"
                                 >
                                   <Pencil size={17} />
                                 </button>
                                 <button
                                   onClick={(e) => { e.stopPropagation(); remove(s.id); }}
-                                  className="p-2.5 text-gray-400 hover:text-red-500 rounded-lg active:bg-red-50"
+                                  className="p-2.5 text-gray-400 dark:text-gray-500 hover:text-red-500 rounded-lg active:bg-red-50 dark:active:bg-red-950/30"
                                 >
                                   <Trash2 size={17} />
                                 </button>
-                                <span className="text-gray-300 ml-1">
+                                <span className="text-gray-300 dark:text-gray-600 ml-1">
                                   {expanded ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
                                 </span>
                               </div>
                             </div>
                             {expanded && (
-                              <div className="border-t bg-gray-50 px-4 py-3 space-y-3">
+                              <div className="border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 px-4 py-3 space-y-3">
                                 {s.ingredients.length > 0 && (
                                   <div>
-                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t.sides.ingredientsSection}</p>
+                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">{t.sides.ingredientsSection}</p>
                                     <ul className="space-y-1">
                                       {s.ingredients.map((ing, i) => (
-                                        <li key={i} className="flex justify-between text-sm text-gray-700">
+                                        <li key={i} className="flex justify-between text-sm text-gray-700 dark:text-gray-200">
                                           <span>{getIngredientName(ing.ingredientId)}</span>
                                           {(ing.amount || ing.unit) && (
-                                            <span className="text-gray-400 ml-4 flex-shrink-0">{ing.amount} {ing.unit}</span>
+                                            <span className="text-gray-400 dark:text-gray-500 ml-4 flex-shrink-0">{ing.amount} {ing.unit}</span>
                                           )}
                                         </li>
                                       ))}
@@ -174,12 +174,12 @@ export default function Sides() {
                                 )}
                                 {s.recipe && (
                                   <div>
-                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t.sides.recipeSection}</p>
-                                    <p className="text-sm text-gray-600 whitespace-pre-wrap">{s.recipe}</p>
+                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">{t.sides.recipeSection}</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{s.recipe}</p>
                                   </div>
                                 )}
                                 {s.ingredients.length === 0 && !s.recipe && (
-                                  <p className="text-sm text-gray-400">{t.sides.noDetails}</p>
+                                  <p className="text-sm text-gray-400 dark:text-gray-500">{t.sides.noDetails}</p>
                                 )}
                               </div>
                             )}
@@ -199,19 +199,19 @@ export default function Sides() {
         <Modal title={isNew ? t.sides.modalTitleNew : t.sides.modalTitleEdit} onClose={close} wide>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.sides.nameLabel}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t.sides.nameLabel}</label>
               <input
-                className="w-full border rounded-xl px-4 py-3"
+                className="w-full border dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 dark:text-gray-100"
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder={t.sides.namePlaceholder}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.sides.categoryLabel}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t.sides.categoryLabel}</label>
               <div className="flex gap-2">
                 <select
-                  className="flex-1 border rounded-xl px-4 py-3"
+                  className="flex-1 border dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 dark:text-gray-100"
                   value={form.categoryId}
                   onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))}
                 >
@@ -223,7 +223,7 @@ export default function Sides() {
                   <button
                     type="button"
                     onClick={() => setShowNewCat(true)}
-                    className="px-3 py-2.5 border rounded-xl text-amber-600 hover:bg-amber-50 text-sm font-medium flex items-center gap-1 flex-shrink-0"
+                    className="px-3 py-2.5 border dark:border-gray-600 rounded-xl text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 text-sm font-medium flex items-center gap-1 flex-shrink-0"
                   >
                     <Plus size={14} /> {t.sides.newCategoryBtn}
                   </button>
@@ -232,7 +232,7 @@ export default function Sides() {
               {showNewCat && (
                 <div className="flex gap-2 mt-2">
                   <input
-                    className="flex-1 border rounded-xl px-3 py-2.5 text-sm"
+                    className="flex-1 border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
                     placeholder={t.sides.categoryNamePlaceholder}
                     value={newCatName}
                     onChange={(e) => setNewCatName(e.target.value)}
@@ -249,7 +249,7 @@ export default function Sides() {
                   <button
                     type="button"
                     onClick={() => { setShowNewCat(false); setNewCatName(''); }}
-                    className="p-2.5 border rounded-xl text-gray-500 flex-shrink-0"
+                    className="p-2.5 border dark:border-gray-600 rounded-xl text-gray-500 dark:text-gray-400 flex-shrink-0"
                   >
                     <X size={16} />
                   </button>
@@ -257,16 +257,16 @@ export default function Sides() {
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.sides.ingredientsLabel}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t.sides.ingredientsLabel}</label>
               <IngredientEditor
                 items={form.ingredients}
                 onChange={(items) => setForm((f) => ({ ...f, ingredients: items }))}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.sides.recipeLabel}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t.sides.recipeLabel}</label>
               <textarea
-                className="w-full border rounded-xl px-4 py-3 text-sm min-h-[80px] resize-none"
+                className="w-full border dark:border-gray-600 rounded-xl px-4 py-3 text-sm min-h-[80px] resize-none bg-white dark:bg-gray-700 dark:text-gray-100"
                 value={form.recipe}
                 onChange={(e) => setForm((f) => ({ ...f, recipe: e.target.value }))}
                 placeholder={t.sides.recipePlaceholder}
@@ -279,7 +279,7 @@ export default function Sides() {
             >
               {t.sides.saveBtn}
             </button>
-            <button onClick={close} className="w-full border py-3.5 rounded-xl font-medium text-gray-600">
+            <button onClick={close} className="w-full border dark:border-gray-600 py-3.5 rounded-xl font-medium text-gray-600 dark:text-gray-300">
               {t.sides.cancelBtn}
             </button>
           </div>

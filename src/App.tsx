@@ -1,6 +1,7 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AppProvider } from './AppContext';
 import { LanguageProvider, useLang } from './LanguageContext';
+import { ThemeProvider } from './ThemeContext';
 import Layout from './components/Layout';
 import Plans from './pages/Plans';
 import PlanDetail from './pages/PlanDetail';
@@ -39,8 +40,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <AppContent />
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AppContent />
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }

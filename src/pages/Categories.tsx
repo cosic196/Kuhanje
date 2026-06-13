@@ -40,18 +40,18 @@ function CategorySection({
   };
 
   return (
-    <div className="bg-white rounded-xl border p-4">
-      <h2 className="text-base font-semibold text-gray-800 mb-3">{title}</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4">
+      <h2 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-3">{title}</h2>
 
       <div className="space-y-1.5 mb-4">
         {items.length === 0 && (
-          <p className="text-sm text-gray-400 py-1">{noCatsText}</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 py-1">{noCatsText}</p>
         )}
         {items.map((cat) =>
           editId === cat.id ? (
             <div key={cat.id} className="flex gap-2 items-center">
               <input
-                className="flex-1 border rounded-xl px-3 py-2.5 text-sm"
+                className="flex-1 border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 onKeyDown={(e) => {
@@ -62,7 +62,7 @@ function CategorySection({
               <button onClick={commitEdit} className="p-2.5 bg-amber-600 text-white rounded-xl">
                 <Check size={16} />
               </button>
-              <button onClick={() => setEditId(null)} className="p-2.5 border rounded-xl text-gray-500">
+              <button onClick={() => setEditId(null)} className="p-2.5 border dark:border-gray-600 rounded-xl text-gray-500 dark:text-gray-400">
                 <X size={16} />
               </button>
             </div>
@@ -72,13 +72,13 @@ function CategorySection({
               <div className="flex gap-1">
                 <button
                   onClick={() => { setEditId(cat.id); setEditName(cat.name); }}
-                  className="p-2.5 text-gray-400 hover:text-amber-600 rounded-lg active:bg-amber-50"
+                  className="p-2.5 text-gray-400 dark:text-gray-500 hover:text-amber-600 rounded-lg active:bg-amber-50 dark:active:bg-amber-900/30"
                 >
                   <Pencil size={15} />
                 </button>
                 <button
                   onClick={() => onDelete(cat.id)}
-                  className="p-2.5 text-gray-400 hover:text-red-500 rounded-lg active:bg-red-50"
+                  className="p-2.5 text-gray-400 dark:text-gray-500 hover:text-red-500 rounded-lg active:bg-red-50 dark:active:bg-red-950/30"
                 >
                   <Trash2 size={15} />
                 </button>
@@ -90,7 +90,7 @@ function CategorySection({
 
       <div className="flex gap-2">
         <input
-          className="flex-1 border rounded-xl px-3 py-2.5 text-sm"
+          className="flex-1 border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
           placeholder={newCatPlaceholder}
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
@@ -128,7 +128,7 @@ export default function Categories() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4">
+      <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
         <Tag className="text-amber-600" size={22} /> {t.categories.title}
       </h1>
       <div className="space-y-4">
@@ -138,7 +138,7 @@ export default function Categories() {
           onAdd={addMealCat}
           onEdit={editMealCat}
           onDelete={deleteMealCat}
-          badgeClass="text-amber-700 bg-amber-50"
+          badgeClass="text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50"
           noCatsText={t.categories.noCats}
           newCatPlaceholder={t.categories.newCatPlaceholder}
         />
@@ -148,7 +148,7 @@ export default function Categories() {
           onAdd={addSideCat}
           onEdit={editSideCat}
           onDelete={deleteSideCat}
-          badgeClass="text-blue-700 bg-blue-50"
+          badgeClass="text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/50"
           noCatsText={t.categories.noCats}
           newCatPlaceholder={t.categories.newCatPlaceholder}
         />

@@ -155,7 +155,7 @@ export default function Plans() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold text-gray-800">{t.plans.title}</h1>
+        <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">{t.plans.title}</h1>
         <button
           onClick={openNew}
           className="flex items-center gap-1.5 bg-amber-600 text-white px-4 py-2.5 rounded-xl hover:bg-amber-700 font-medium text-sm active:scale-95 transition-transform"
@@ -165,7 +165,7 @@ export default function Plans() {
       </div>
 
       {data.meals.length < 5 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 text-sm text-amber-800">
+        <div className="bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-4 text-sm text-amber-800 dark:text-amber-200">
           {t.plans.addMealsPrompt}{' '}
           <Link to="/jela" className="underline font-medium">
             {t.plans.addMealsLink}
@@ -174,7 +174,7 @@ export default function Plans() {
       )}
 
       {data.plans.length === 0 ? (
-        <div className="text-center py-20 text-gray-400">
+        <div className="text-center py-20 text-gray-400 dark:text-gray-500">
           <Calendar size={52} className="mx-auto mb-3 opacity-20" />
           <p className="font-medium">{t.plans.noPlanTitle}</p>
           <p className="text-sm mt-1">{t.plans.noPlanSub}</p>
@@ -185,15 +185,15 @@ export default function Plans() {
             <Link
               key={plan.id}
               to={`/plan/${plan.id}`}
-              className="flex items-center gap-3 bg-white rounded-xl border p-4 active:bg-gray-50 transition-colors"
+              className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4 active:bg-gray-50 dark:active:bg-gray-700 transition-colors"
             >
-              <div className="bg-amber-100 rounded-xl p-2.5 flex-shrink-0">
-                <Calendar size={22} className="text-amber-600" />
+              <div className="bg-amber-100 dark:bg-amber-900/40 rounded-xl p-2.5 flex-shrink-0">
+                <Calendar size={22} className="text-amber-600 dark:text-amber-400" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-800 truncate">{plan.name}</p>
-                <p className="text-sm text-gray-500">{formatDateRange(plan)}</p>
-                <p className="text-xs text-gray-400">{t.plans.daysCount(plan.days.length)}</p>
+                <p className="font-semibold text-gray-800 dark:text-gray-100 truncate">{plan.name}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{formatDateRange(plan)}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{t.plans.daysCount(plan.days.length)}</p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button
@@ -201,11 +201,11 @@ export default function Plans() {
                     e.preventDefault();
                     removePlan(plan.id);
                   }}
-                  className="p-2 text-gray-300 hover:text-red-400 active:text-red-600"
+                  className="p-2 text-gray-300 dark:text-gray-600 hover:text-red-400 active:text-red-600"
                 >
                   <Trash2 size={17} />
                 </button>
-                <ChevronRight size={18} className="text-gray-300" />
+                <ChevronRight size={18} className="text-gray-300 dark:text-gray-600" />
               </div>
             </Link>
           ))}
@@ -220,33 +220,33 @@ export default function Plans() {
           {!proposedPlan ? (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">
                   {t.plans.planNameLabel}
                 </label>
                 <input
-                  className="w-full border rounded-xl px-4 py-3"
+                  className="w-full border dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 dark:text-gray-100"
                   value={planName}
                   onChange={(e) => setPlanName(e.target.value)}
                   placeholder={t.plans.planNamePlaceholder(startDateFormatted)}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">
                   {t.plans.startDateLabel}
                 </label>
                 <input
                   type="date"
-                  className="w-full border rounded-xl px-4 py-3"
+                  className="w-full border dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 dark:text-gray-100"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
               </div>
-              <div className="bg-gray-50 rounded-xl p-3 text-sm text-gray-600">
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 text-sm text-gray-600 dark:text-gray-300">
                 {t.plans.durationInfo(data.settings.planDurationDays)}
-                <span className="text-gray-400 ml-1">{t.plans.durationNote}</span>
+                <span className="text-gray-400 dark:text-gray-500 ml-1">{t.plans.durationNote}</span>
               </div>
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700">
+                <div className="bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-xl p-3 text-sm text-red-700 dark:text-red-300">
                   {error}
                 </div>
               )}
@@ -265,7 +265,7 @@ export default function Plans() {
               </button>
               <button
                 onClick={cancelNew}
-                className="w-full border py-3.5 rounded-xl hover:bg-gray-50 font-medium text-gray-600"
+                className="w-full border dark:border-gray-600 py-3.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 font-medium text-gray-600 dark:text-gray-300"
               >
                 {t.plans.cancelBtn}
               </button>
@@ -273,7 +273,7 @@ export default function Plans() {
           ) : (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {t.plans.deselectInstruction}
                 </p>
                 <button
@@ -296,39 +296,39 @@ export default function Plans() {
                       onClick={() => toggleDay(idx)}
                       className={`w-full flex items-center gap-2.5 rounded-xl border px-3 py-2 text-left transition-colors cursor-pointer select-none ${
                         isSkipped
-                          ? 'bg-gray-50 border-gray-200'
+                          ? 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600'
                           : isKept
-                            ? 'bg-white border-gray-200'
-                            : 'bg-gray-50 border-dashed border-amber-300'
+                            ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600'
+                            : 'bg-gray-50 dark:bg-gray-700/50 border-dashed border-amber-300 dark:border-amber-700'
                       }`}
                     >
                       <div
                         className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
                           isSkipped
-                            ? 'border-gray-200 bg-gray-100'
+                            ? 'border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700'
                             : isKept
                               ? 'bg-amber-600 border-amber-600'
-                              : 'border-gray-300 bg-white'
+                              : 'border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700'
                         }`}
                       >
                         {isKept && !isSkipped && <Check size={11} className="text-white" />}
                       </div>
-                      <div className="flex-shrink-0 w-6 h-6 rounded bg-amber-100 flex items-center justify-center text-xs font-bold text-amber-700">
+                      <div className="flex-shrink-0 w-6 h-6 rounded bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-xs font-bold text-amber-700 dark:text-amber-300">
                         {idx + 1}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[11px] text-gray-400 leading-none mb-0.5">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-none mb-0.5">
                           {formatDayShort(day.date, t.daysShort, t.locale)}
                         </p>
                         {isSkipped ? (
-                          <p className="text-xs text-gray-400 italic">{t.plans.skipped}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500 italic">{t.plans.skipped}</p>
                         ) : (
-                          <p className={`text-sm font-medium truncate ${isKept ? 'text-gray-800' : 'text-gray-400'}`}>
+                          <p className={`text-sm font-medium truncate ${isKept ? 'text-gray-800 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'}`}>
                             {meal?.name ?? (
                               <span className="text-red-400 italic text-xs">{t.plans.notSelected}</span>
                             )}
                             {side && (
-                              <span className="font-normal text-gray-400"> + {side.name}</span>
+                              <span className="font-normal text-gray-400 dark:text-gray-500"> + {side.name}</span>
                             )}
                           </p>
                         )}
@@ -338,8 +338,8 @@ export default function Plans() {
                         title={isSkipped ? t.plans.skipped : t.plans.skipDay}
                         className={`p-1 rounded-lg flex-shrink-0 transition-colors ${
                           isSkipped
-                            ? 'text-red-400 bg-red-50 hover:bg-red-100'
-                            : 'text-gray-300 hover:text-gray-500 hover:bg-gray-100'
+                            ? 'text-red-400 bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/30'
+                            : 'text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                         }`}
                       >
                         <Ban size={14} />
@@ -350,7 +350,7 @@ export default function Plans() {
               </div>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700">
+                <div className="bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-xl p-3 text-sm text-red-700 dark:text-red-300">
                   {error}
                 </div>
               )}
@@ -358,7 +358,7 @@ export default function Plans() {
               <button
                 onClick={doRegenerateSelected}
                 disabled={generating || uncheckedCount === 0}
-                className="w-full border border-amber-600 text-amber-700 py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 disabled:opacity-40 active:scale-95 transition-transform"
+                className="w-full border border-amber-600 text-amber-700 dark:text-amber-400 py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 disabled:opacity-40 active:scale-95 transition-transform"
               >
                 {generating ? (
                   <>
@@ -369,7 +369,7 @@ export default function Plans() {
                     <RefreshCw size={15} />
                     {t.plans.regenerateBtn}
                     {uncheckedCount > 0 && (
-                      <span className="bg-amber-100 text-amber-700 text-xs px-1.5 py-0.5 rounded-full">
+                      <span className="bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs px-1.5 py-0.5 rounded-full">
                         {uncheckedCount}
                       </span>
                     )}
@@ -387,7 +387,7 @@ export default function Plans() {
 
               <button
                 onClick={cancelNew}
-                className="w-full border py-3.5 rounded-xl text-sm font-medium text-gray-600"
+                className="w-full border dark:border-gray-600 py-3.5 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300"
               >
                 {t.plans.cancelBtn}
               </button>

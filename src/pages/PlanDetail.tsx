@@ -88,7 +88,7 @@ export default function PlanDetail() {
   if (!plan) {
     return (
       <div className="text-center py-20">
-        <p className="text-gray-400 mb-4">{t.planDetail.notFound}</p>
+        <p className="text-gray-400 dark:text-gray-500 mb-4">{t.planDetail.notFound}</p>
         <Link to="/" className="text-amber-600 underline">{t.planDetail.backToPlans}</Link>
       </div>
     );
@@ -202,27 +202,27 @@ export default function PlanDetail() {
     <div>
       {/* Header */}
       <div className="flex items-center gap-2 mb-4 print:hidden">
-        <button onClick={() => navigate('/')} className="p-2 rounded-xl hover:bg-gray-100 text-gray-600 -ml-1">
+        <button onClick={() => navigate('/')} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 -ml-1">
           <ArrowLeft size={22} />
         </button>
         <div className="flex-1 min-w-0">
-          <h1 className="text-lg font-bold text-gray-800 truncate">{plan.name}</h1>
-          <p className="text-xs text-gray-400">{t.plans.daysCount(plan.days.length)}</p>
+          <h1 className="text-lg font-bold text-gray-800 dark:text-gray-100 truncate">{plan.name}</h1>
+          <p className="text-xs text-gray-400 dark:text-gray-500">{t.plans.daysCount(plan.days.length)}</p>
         </div>
         <button
           onClick={() => window.print()}
-          className="p-2.5 border rounded-xl hover:bg-gray-50 text-gray-600"
+          className="p-2.5 border dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300"
         >
           <Printer size={19} />
         </button>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1.5 mb-4 print:hidden bg-gray-100 p-1 rounded-xl">
+      <div className="flex gap-1.5 mb-4 print:hidden bg-gray-100 dark:bg-gray-700/50 p-1 rounded-xl">
         <button
           onClick={() => setTab('plan')}
           className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-            tab === 'plan' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500'
+            tab === 'plan' ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm' : 'text-gray-500 dark:text-gray-400'
           }`}
         >
           {t.planDetail.tabPlan}
@@ -230,7 +230,7 @@ export default function PlanDetail() {
         <button
           onClick={() => setTab('shopping')}
           className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1.5 ${
-            tab === 'shopping' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500'
+            tab === 'shopping' ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm' : 'text-gray-500 dark:text-gray-400'
           }`}
         >
           <ShoppingCart size={15} />
@@ -247,9 +247,9 @@ export default function PlanDetail() {
       {tab === 'plan' && (
         <div>
           {regenMode ? (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-3">
+            <div className="bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-xl p-3 mb-3">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-medium text-amber-800">
+                <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
                   {t.planDetail.regenModeInstruction}
                 </p>
                 <button onClick={toggleAllRegen} className="text-xs text-amber-600 underline">
@@ -257,7 +257,7 @@ export default function PlanDetail() {
                 </button>
               </div>
               {regenError && (
-                <p className="text-xs text-red-600 mb-2">{regenError}</p>
+                <p className="text-xs text-red-600 dark:text-red-400 mb-2">{regenError}</p>
               )}
               <div className="flex gap-2">
                 <button
@@ -276,7 +276,7 @@ export default function PlanDetail() {
                 </button>
                 <button
                   onClick={exitRegenMode}
-                  className="flex items-center gap-1.5 px-4 py-2.5 border rounded-xl text-sm text-gray-600"
+                  className="flex items-center gap-1.5 px-4 py-2.5 border dark:border-gray-600 rounded-xl text-sm text-gray-600 dark:text-gray-300"
                 >
                   <X size={14} /> {t.planDetail.closeBtn}
                 </button>
@@ -286,7 +286,7 @@ export default function PlanDetail() {
             <div className="flex justify-end mb-3 print:hidden">
               <button
                 onClick={enterRegenMode}
-                className="flex items-center gap-1.5 text-sm px-3 py-2 border rounded-xl hover:bg-gray-50 text-gray-600"
+                className="flex items-center gap-1.5 text-sm px-3 py-2 border dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300"
               >
                 <RefreshCw size={14} /> {t.planDetail.regenDaysBtn}
               </button>
@@ -309,13 +309,13 @@ export default function PlanDetail() {
               return (
                 <div
                   key={idx}
-                  className={`bg-white rounded-xl border overflow-hidden print:border-b print:rounded-none print:shadow-none transition-opacity ${
-                    regenMode && !isKept ? 'opacity-50 border-dashed border-amber-300' : ''
-                  } ${isContinuation ? 'border-l-2 border-l-amber-300' : ''}`}
+                  className={`bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 overflow-hidden print:border-b print:rounded-none print:shadow-none transition-opacity ${
+                    regenMode && !isKept ? 'opacity-50 border-dashed border-amber-300 dark:border-amber-700' : ''
+                  } ${isContinuation ? 'border-l-2 border-l-amber-300 dark:border-l-amber-600' : ''}`}
                 >
                   {isEditing && !regenMode ? (
                     <div className="p-4">
-                      <p className="text-xs text-gray-400 mb-3">
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">
                         {formatDate(day.date, t.daysFull, t.daysShort, t.locale)}
                       </p>
                       <EditDayForm
@@ -328,7 +328,7 @@ export default function PlanDetail() {
                   ) : (
                     <>
                       <button
-                        className="w-full flex items-center gap-3 p-4 text-left active:bg-gray-50"
+                        className="w-full flex items-center gap-3 p-4 text-left active:bg-gray-50 dark:active:bg-gray-700"
                         onClick={() => {
                           if (regenMode) {
                             toggleDayRegen(idx);
@@ -340,23 +340,23 @@ export default function PlanDetail() {
                         {regenMode ? (
                           <div
                             className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                              isKept ? 'bg-amber-600 border-amber-600' : 'border-gray-300 bg-white'
+                              isKept ? 'bg-amber-600 border-amber-600' : 'border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700'
                             }`}
                           >
                             {isKept && <Check size={11} className="text-white" />}
                           </div>
                         ) : (
-                          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-xs font-bold text-amber-700">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-xs font-bold text-amber-700 dark:text-amber-300">
                             {idx + 1}
                           </div>
                         )}
                         {regenMode && (
-                          <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center text-xs font-bold text-amber-700">
+                          <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-xs font-bold text-amber-700 dark:text-amber-300">
                             {idx + 1}
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-gray-400 dark:text-gray-500">
                             {formatDate(day.date, t.daysFull, t.daysShort, t.locale, true)}
                           </p>
                           <div className="flex items-center gap-1.5 flex-wrap">
@@ -364,66 +364,66 @@ export default function PlanDetail() {
                               <CornerDownRight size={13} className="text-amber-400 flex-shrink-0" />
                             )}
                             {isSkipped ? (
-                              <span className="flex items-center gap-1 text-xs text-gray-400 italic bg-gray-100 px-2 py-0.5 rounded">
+                              <span className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 italic bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
                                 <Ban size={11} /> {t.planDetail.skipped}
                               </span>
                             ) : (
-                              <p className={`font-semibold text-sm truncate ${isContinuation ? 'text-gray-500' : 'text-gray-800'}`}>
+                              <p className={`font-semibold text-sm truncate ${isContinuation ? 'text-gray-500 dark:text-gray-400' : 'text-gray-800 dark:text-gray-100'}`}>
                                 {meal ? meal.name : <span className="text-red-400 italic">{t.planDetail.notSelected}</span>}
-                                {side && <span className="text-gray-400 font-normal"> + {side.name}</span>}
+                                {side && <span className="text-gray-400 dark:text-gray-500 font-normal"> + {side.name}</span>}
                               </p>
                             )}
                             {isContinuation && (
-                              <span className="text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded flex-shrink-0">
+                              <span className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/40 px-1.5 py-0.5 rounded flex-shrink-0">
                                 {t.planDetail.continuation}
                               </span>
                             )}
                           </div>
-                          {day.notes && <p className="text-xs text-gray-400 mt-0.5 truncate">{day.notes}</p>}
+                          {day.notes && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 truncate">{day.notes}</p>}
                         </div>
                         {!regenMode && (
                           <div className="flex items-center gap-2 flex-shrink-0 print:hidden">
                             <button
                               onClick={(e) => { e.stopPropagation(); setEditDayIdx(idx); setExpandedDayIdx(null); }}
-                              className="p-2 text-gray-300 hover:text-amber-600 rounded-lg"
+                              className="p-2 text-gray-300 dark:text-gray-600 hover:text-amber-600 rounded-lg"
                             >
                               <Pencil size={16} />
                             </button>
-                            {isExpanded ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-300" />}
+                            {isExpanded ? <ChevronUp size={16} className="text-gray-400 dark:text-gray-500" /> : <ChevronDown size={16} className="text-gray-300 dark:text-gray-600" />}
                           </div>
                         )}
                       </button>
 
                       {isExpanded && !regenMode && (
-                        <div className="px-4 pb-4 border-t bg-gray-50">
+                        <div className="px-4 pb-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
                           <div className="space-y-3 mt-3">
                             {meal && (
                               <div>
-                                <p className="text-xs font-semibold text-gray-500 mb-1.5">{t.planDetail.mealIngredients}</p>
-                                <ul className="text-sm text-gray-600 space-y-1">
+                                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">{t.planDetail.mealIngredients}</p>
+                                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
                                   {meal.ingredients.map((ing, i) => (
                                     <li key={i} className="flex justify-between">
                                       <span>{getIngredientName(ing.ingredientId)}</span>
-                                      <span className="text-gray-400">{ing.amount} {ing.unit}</span>
+                                      <span className="text-gray-400 dark:text-gray-500">{ing.amount} {ing.unit}</span>
                                     </li>
                                   ))}
                                 </ul>
                                 {meal.recipe && (
                                   <details className="mt-2">
                                     <summary className="text-xs font-semibold text-amber-600 cursor-pointer">{t.planDetail.recipe}</summary>
-                                    <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{meal.recipe}</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 whitespace-pre-wrap">{meal.recipe}</p>
                                   </details>
                                 )}
                               </div>
                             )}
                             {side && side.ingredients.length > 0 && (
                               <div>
-                                <p className="text-xs font-semibold text-gray-500 mb-1.5">{t.planDetail.sideIngredients}</p>
-                                <ul className="text-sm text-gray-600 space-y-1">
+                                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">{t.planDetail.sideIngredients}</p>
+                                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
                                   {side.ingredients.map((ing, i) => (
                                     <li key={i} className="flex justify-between">
                                       <span>{getIngredientName(ing.ingredientId)}</span>
-                                      <span className="text-gray-400">{ing.amount} {ing.unit}</span>
+                                      <span className="text-gray-400 dark:text-gray-500">{ing.amount} {ing.unit}</span>
                                     </li>
                                   ))}
                                 </ul>
@@ -445,29 +445,29 @@ export default function PlanDetail() {
       {tab === 'shopping' && (
         <div>
           <div className="flex items-center justify-between mb-3 print:hidden">
-            <p className="text-sm text-gray-500">{t.planDetail.shoppingInstruction}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t.planDetail.shoppingInstruction}</p>
             <button
               onClick={rebuildShopping}
-              className="flex items-center gap-1.5 text-sm px-3 py-2 border rounded-xl hover:bg-gray-50"
+              className="flex items-center gap-1.5 text-sm px-3 py-2 border dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300"
             >
               <RefreshCw size={14} /> {t.planDetail.refreshBtn}
             </button>
           </div>
 
           {/* Plan ingredients */}
-          <div className="bg-white rounded-xl border overflow-hidden mb-3">
-            <div className="bg-amber-50 px-4 py-3 border-b">
-              <p className="font-semibold text-amber-800 text-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 overflow-hidden mb-3">
+            <div className="bg-amber-50 dark:bg-amber-950/50 px-4 py-3 border-b dark:border-gray-700">
+              <p className="font-semibold text-amber-800 dark:text-amber-200 text-sm">
                 {t.planDetail.planIngredients}
                 {shopping && shopping.items.length > 0 && (
-                  <span className="ml-2 text-amber-600 font-normal text-xs">
+                  <span className="ml-2 text-amber-600 dark:text-amber-400 font-normal text-xs">
                     {t.planDetail.markedLabel(checkedCount, shopping.items.length)}
                   </span>
                 )}
               </p>
             </div>
             {!shopping || shopping.items.length === 0 ? (
-              <div className="text-center py-8 text-sm text-gray-400">
+              <div className="text-center py-8 text-sm text-gray-400 dark:text-gray-500">
                 <UtensilsCrossed size={28} className="mx-auto mb-2 opacity-30" />
                 <p>{t.planDetail.noIngredients}</p>
                 <p className="text-xs">{t.planDetail.noIngredientsNote}</p>
@@ -477,19 +477,19 @@ export default function PlanDetail() {
                 {shopping.items.map((item) => (
                   <li
                     key={item.ingredientId}
-                    className={`flex items-center gap-3 px-4 py-4 border-b last:border-0 active:bg-gray-50 cursor-pointer ${item.checked ? 'opacity-50' : ''}`}
+                    className={`flex items-center gap-3 px-4 py-4 border-b dark:border-gray-700 last:border-0 active:bg-gray-50 dark:active:bg-gray-700 cursor-pointer ${item.checked ? 'opacity-50' : ''}`}
                     onClick={() => toggleShoppingItem(item.ingredientId)}
                   >
                     <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                      item.checked ? 'bg-green-500 border-green-500' : 'border-gray-300'
+                      item.checked ? 'bg-green-500 border-green-500' : 'border-gray-300 dark:border-gray-500'
                     }`}>
                       {item.checked && <Check size={14} className="text-white" />}
                     </div>
-                    <span className={`flex-1 text-sm ${item.checked ? 'line-through text-gray-400' : 'text-gray-800'}`}>
+                    <span className={`flex-1 text-sm ${item.checked ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-800 dark:text-gray-100'}`}>
                       {getIngredientName(item.ingredientId)}
                     </span>
                     {(item.amount || item.unit) && (
-                      <span className="text-sm text-gray-400 text-right flex-shrink-0">
+                      <span className="text-sm text-gray-400 dark:text-gray-500 text-right flex-shrink-0">
                         {item.amount} {item.unit}
                       </span>
                     )}
@@ -500,11 +500,11 @@ export default function PlanDetail() {
           </div>
 
           {/* Common ingredients */}
-          <div className="bg-white rounded-xl border overflow-hidden">
-            <div className="bg-yellow-50 px-4 py-3 border-b">
-              <p className="font-semibold text-yellow-800 text-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 overflow-hidden">
+            <div className="bg-yellow-50 dark:bg-yellow-950/50 px-4 py-3 border-b dark:border-gray-700">
+              <p className="font-semibold text-yellow-800 dark:text-yellow-200 text-sm">
                 {t.planDetail.commonIngredients}
-                <span className="ml-2 text-yellow-600 font-normal text-xs">
+                <span className="ml-2 text-yellow-600 dark:text-yellow-400 font-normal text-xs">
                   {t.planDetail.markedLabel(commonCheckedCount, data.ingredients.filter((i) => i.isCommon).length)}
                 </span>
               </p>
@@ -515,15 +515,15 @@ export default function PlanDetail() {
                 return (
                   <li
                     key={ing.id}
-                    className={`flex items-center gap-3 px-4 py-4 border-b last:border-0 active:bg-gray-50 cursor-pointer ${checked ? 'opacity-50' : ''}`}
+                    className={`flex items-center gap-3 px-4 py-4 border-b dark:border-gray-700 last:border-0 active:bg-gray-50 dark:active:bg-gray-700 cursor-pointer ${checked ? 'opacity-50' : ''}`}
                     onClick={() => toggleCommonItem(ing.id)}
                   >
                     <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                      checked ? 'bg-green-500 border-green-500' : 'border-yellow-400'
+                      checked ? 'bg-green-500 border-green-500' : 'border-yellow-400 dark:border-yellow-600'
                     }`}>
                       {checked && <Check size={14} className="text-white" />}
                     </div>
-                    <span className={`flex-1 text-sm ${checked ? 'line-through text-gray-400' : 'text-gray-800'}`}>
+                    <span className={`flex-1 text-sm ${checked ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-800 dark:text-gray-100'}`}>
                       {ing.name}
                     </span>
                   </li>
@@ -573,13 +573,13 @@ function EditDayForm({
         onClick={() => setSkipped((v) => !v)}
         className={`w-full flex items-center gap-2.5 px-4 py-3 rounded-xl border text-sm font-medium transition-colors ${
           skipped
-            ? 'bg-red-50 border-red-200 text-red-600'
-            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+            ? 'bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400'
+            : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
         }`}
       >
-        <Ban size={16} className={skipped ? 'text-red-500' : 'text-gray-400'} />
+        <Ban size={16} className={skipped ? 'text-red-500' : 'text-gray-400 dark:text-gray-500'} />
         {t.planDetail.skipDayLabel}
-        <div className={`ml-auto w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${skipped ? 'bg-red-500' : 'bg-gray-200'}`}>
+        <div className={`ml-auto w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${skipped ? 'bg-red-500' : 'bg-gray-200 dark:bg-gray-600'}`}>
           <div className={`w-4 h-4 rounded-full bg-white shadow transition-transform ${skipped ? 'translate-x-4' : 'translate-x-0'}`} />
         </div>
       </button>
@@ -587,7 +587,7 @@ function EditDayForm({
       {!skipped && (
         <>
           <select
-            className="w-full border rounded-xl px-4 py-3 text-sm"
+            className="w-full border dark:border-gray-600 rounded-xl px-4 py-3 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
             value={mealId}
             onChange={(e) => { setMealId(e.target.value); setSideId(''); }}
           >
@@ -597,7 +597,7 @@ function EditDayForm({
             ))}
           </select>
           <select
-            className="w-full border rounded-xl px-4 py-3 text-sm"
+            className="w-full border dark:border-gray-600 rounded-xl px-4 py-3 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
             value={sideId}
             onChange={(e) => setSideId(e.target.value)}
           >
@@ -610,7 +610,7 @@ function EditDayForm({
       )}
 
       <input
-        className="w-full border rounded-xl px-4 py-3 text-sm"
+        className="w-full border dark:border-gray-600 rounded-xl px-4 py-3 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
         placeholder={t.planDetail.notesPlaceholder}
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
@@ -622,7 +622,7 @@ function EditDayForm({
         >
           {t.planDetail.saveBtn}
         </button>
-        <button onClick={onCancel} className="flex-1 border py-3 rounded-xl text-sm font-medium text-gray-600">
+        <button onClick={onCancel} className="flex-1 border dark:border-gray-600 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300">
           {t.planDetail.cancelBtn}
         </button>
       </div>

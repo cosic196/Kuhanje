@@ -143,7 +143,7 @@ export default function Meals() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold text-gray-800">{t.meals.title}</h1>
+        <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">{t.meals.title}</h1>
         <button
           onClick={openNew}
           className="flex items-center gap-1.5 bg-amber-600 text-white px-4 py-2.5 rounded-xl font-medium text-sm active:scale-95 transition-transform"
@@ -153,9 +153,9 @@ export default function Meals() {
       </div>
 
       <div className="relative mb-3">
-        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
         <input
-          className="w-full border rounded-xl pl-10 pr-4 py-3 bg-white"
+          className="w-full border dark:border-gray-700 rounded-xl pl-10 pr-4 py-3 bg-white dark:bg-gray-800 dark:text-gray-100"
           placeholder={t.meals.search}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -163,7 +163,7 @@ export default function Meals() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="text-center py-20 text-gray-400">
+        <div className="text-center py-20 text-gray-400 dark:text-gray-500">
           <ChefHat size={48} className="mx-auto mb-3 opacity-20" />
           <p className="font-medium">{t.meals.noMeals}</p>
           <p className="text-sm mt-1">{t.meals.noMealsSub}</p>
@@ -185,10 +185,10 @@ export default function Meals() {
                     onClick={() => toggleCat(cat.id)}
                     className="w-full flex items-center gap-2 mb-2 group"
                   >
-                    <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">{cat.name}</span>
-                    <span className="text-xs text-gray-400 font-normal">({items.length})</span>
-                    <div className="flex-1 h-px bg-gray-200" />
-                    <span className="text-gray-400">
+                    <span className="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wide">{cat.name}</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500 font-normal">({items.length})</span>
+                    <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                    <span className="text-gray-400 dark:text-gray-500">
                       {collapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
                     </span>
                   </button>
@@ -197,16 +197,16 @@ export default function Meals() {
                       {items.map((m) => {
                         const expanded = expandedIds.has(m.id);
                         return (
-                          <div key={m.id} className="bg-white rounded-xl border overflow-hidden">
+                          <div key={m.id} className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 overflow-hidden">
                             <div
                               className="flex items-center gap-3 p-4 cursor-pointer select-none"
                               onClick={() => toggleExpand(m.id)}
                             >
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  <p className="font-semibold text-gray-800 truncate">{m.name}</p>
+                                  <p className="font-semibold text-gray-800 dark:text-gray-100 truncate">{m.name}</p>
                                   {(m.daysCount ?? 1) > 1 && (
-                                    <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full flex-shrink-0">
+                                    <span className="text-xs bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-full flex-shrink-0">
                                       {t.plans.daysCount(m.daysCount!)}
                                     </span>
                                   )}
@@ -214,10 +214,10 @@ export default function Meals() {
                                 {(m.ingredients.length > 0 || m.possibleSideIds.length > 0) && (
                                   <div className="flex items-center gap-2 mt-1 flex-wrap">
                                     {m.ingredients.length > 0 && (
-                                      <span className="text-xs text-gray-400">{t.meals.ingredientCount(m.ingredients.length)}</span>
+                                      <span className="text-xs text-gray-400 dark:text-gray-500">{t.meals.ingredientCount(m.ingredients.length)}</span>
                                     )}
                                     {m.possibleSideIds.length > 0 && (
-                                      <span className="text-xs text-gray-400">{t.meals.sideCount(m.possibleSideIds.length)}</span>
+                                      <span className="text-xs text-gray-400 dark:text-gray-500">{t.meals.sideCount(m.possibleSideIds.length)}</span>
                                     )}
                                   </div>
                                 )}
@@ -225,32 +225,32 @@ export default function Meals() {
                               <div className="flex gap-1 flex-shrink-0 items-center">
                                 <button
                                   onClick={(e) => { e.stopPropagation(); openEdit(m); }}
-                                  className="p-2.5 text-gray-400 hover:text-amber-600 rounded-lg active:bg-amber-50"
+                                  className="p-2.5 text-gray-400 dark:text-gray-500 hover:text-amber-600 rounded-lg active:bg-amber-50 dark:active:bg-amber-900/30"
                                 >
                                   <Pencil size={17} />
                                 </button>
                                 <button
                                   onClick={(e) => { e.stopPropagation(); remove(m.id); }}
-                                  className="p-2.5 text-gray-400 hover:text-red-500 rounded-lg active:bg-red-50"
+                                  className="p-2.5 text-gray-400 dark:text-gray-500 hover:text-red-500 rounded-lg active:bg-red-50 dark:active:bg-red-950/30"
                                 >
                                   <Trash2 size={17} />
                                 </button>
-                                <span className="text-gray-300 ml-1">
+                                <span className="text-gray-300 dark:text-gray-600 ml-1">
                                   {expanded ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
                                 </span>
                               </div>
                             </div>
                             {expanded && (
-                              <div className="border-t bg-gray-50 px-4 py-3 space-y-3">
+                              <div className="border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 px-4 py-3 space-y-3">
                                 {m.ingredients.length > 0 && (
                                   <div>
-                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t.meals.ingredientsSection}</p>
+                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">{t.meals.ingredientsSection}</p>
                                     <ul className="space-y-1">
                                       {m.ingredients.map((ing, i) => (
-                                        <li key={i} className="flex justify-between text-sm text-gray-700">
+                                        <li key={i} className="flex justify-between text-sm text-gray-700 dark:text-gray-200">
                                           <span>{getIngredientName(ing.ingredientId)}</span>
                                           {(ing.amount || ing.unit) && (
-                                            <span className="text-gray-400 ml-4 flex-shrink-0">{ing.amount} {ing.unit}</span>
+                                            <span className="text-gray-400 dark:text-gray-500 ml-4 flex-shrink-0">{ing.amount} {ing.unit}</span>
                                           )}
                                         </li>
                                       ))}
@@ -259,10 +259,10 @@ export default function Meals() {
                                 )}
                                 {m.possibleSideIds.length > 0 && (
                                   <div>
-                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t.meals.possibleSidesLabel}</p>
+                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">{t.meals.possibleSidesLabel}</p>
                                     <div className="flex flex-wrap gap-1.5">
                                       {m.possibleSideIds.map((id) => (
-                                        <span key={id} className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full">
+                                        <span key={id} className="text-xs bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 px-2.5 py-1 rounded-full">
                                           {getSideName(id)}
                                         </span>
                                       ))}
@@ -271,12 +271,12 @@ export default function Meals() {
                                 )}
                                 {m.recipe && (
                                   <div>
-                                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">{t.meals.recipeSection}</p>
-                                    <p className="text-sm text-gray-600 whitespace-pre-wrap">{m.recipe}</p>
+                                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">{t.meals.recipeSection}</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{m.recipe}</p>
                                   </div>
                                 )}
                                 {m.ingredients.length === 0 && m.possibleSideIds.length === 0 && !m.recipe && (
-                                  <p className="text-sm text-gray-400">{t.meals.noDetails}</p>
+                                  <p className="text-sm text-gray-400 dark:text-gray-500">{t.meals.noDetails}</p>
                                 )}
                               </div>
                             )}
@@ -296,9 +296,9 @@ export default function Meals() {
         <Modal title={isNew ? t.meals.modalTitleNew : t.meals.modalTitleEdit} onClose={close} wide>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.meals.nameLabel}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t.meals.nameLabel}</label>
               <input
-                className="w-full border rounded-xl px-4 py-3"
+                className="w-full border dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 dark:text-gray-100"
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder={t.meals.namePlaceholder}
@@ -306,10 +306,10 @@ export default function Meals() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.meals.daysLabel}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t.meals.daysLabel}</label>
               <div className="flex items-center gap-3">
                 <select
-                  className="border rounded-xl px-4 py-3"
+                  className="border dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 dark:text-gray-100"
                   value={form.daysCount ?? 1}
                   onChange={(e) => setForm((f) => ({ ...f, daysCount: parseInt(e.target.value) }))}
                 >
@@ -317,17 +317,17 @@ export default function Meals() {
                     <option key={n} value={n}>{n}</option>
                   ))}
                 </select>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   {(form.daysCount ?? 1) === 1 ? t.meals.daysUnit1 : t.meals.daysUnitN}
                 </span>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.meals.categoryLabel}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t.meals.categoryLabel}</label>
               <div className="flex gap-2">
                 <select
-                  className="flex-1 border rounded-xl px-4 py-3"
+                  className="flex-1 border dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 dark:text-gray-100"
                   value={form.categoryId}
                   onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))}
                 >
@@ -339,7 +339,7 @@ export default function Meals() {
                   <button
                     type="button"
                     onClick={() => setShowNewCat(true)}
-                    className="px-3 py-2.5 border rounded-xl text-amber-600 hover:bg-amber-50 text-sm font-medium flex items-center gap-1 flex-shrink-0"
+                    className="px-3 py-2.5 border dark:border-gray-600 rounded-xl text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 text-sm font-medium flex items-center gap-1 flex-shrink-0"
                   >
                     <Plus size={14} /> {t.meals.newCategoryBtn}
                   </button>
@@ -348,7 +348,7 @@ export default function Meals() {
               {showNewCat && (
                 <div className="flex gap-2 mt-2">
                   <input
-                    className="flex-1 border rounded-xl px-3 py-2.5 text-sm"
+                    className="flex-1 border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
                     placeholder={t.meals.categoryNamePlaceholder}
                     value={newCatName}
                     onChange={(e) => setNewCatName(e.target.value)}
@@ -365,7 +365,7 @@ export default function Meals() {
                   <button
                     type="button"
                     onClick={() => { setShowNewCat(false); setNewCatName(''); }}
-                    className="p-2.5 border rounded-xl text-gray-500 flex-shrink-0"
+                    className="p-2.5 border dark:border-gray-600 rounded-xl text-gray-500 dark:text-gray-400 flex-shrink-0"
                   >
                     <X size={16} />
                   </button>
@@ -374,7 +374,7 @@ export default function Meals() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.meals.ingredientsLabel}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t.meals.ingredientsLabel}</label>
               <IngredientEditor
                 items={form.ingredients}
                 onChange={(items) => setForm((f) => ({ ...f, ingredients: items }))}
@@ -382,9 +382,9 @@ export default function Meals() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.meals.sidesLabel}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t.meals.sidesLabel}</label>
               {sortedSides.length > 0 && (
-                <div className="grid grid-cols-2 gap-2 max-h-44 overflow-y-auto border rounded-xl p-3 mb-2">
+                <div className="grid grid-cols-2 gap-2 max-h-44 overflow-y-auto border dark:border-gray-600 rounded-xl p-3 mb-2">
                   {sortedSides.map((side) => (
                     <label key={side.id} className="flex items-center gap-2 text-sm cursor-pointer py-1">
                       <input
@@ -393,19 +393,19 @@ export default function Meals() {
                         onChange={() => toggleSide(side.id)}
                         className="accent-amber-600 w-4 h-4"
                       />
-                      <span className="truncate">{side.name}</span>
+                      <span className="truncate text-gray-700 dark:text-gray-200">{side.name}</span>
                     </label>
                   ))}
                 </div>
               )}
               {sortedSides.length === 0 && !showNewSide && (
-                <p className="text-sm text-gray-400 mb-2">{t.meals.noSides}</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 mb-2">{t.meals.noSides}</p>
               )}
               {showNewSide ? (
-                <div className="border rounded-xl p-3 bg-amber-50 space-y-2">
-                  <p className="text-xs font-semibold text-gray-600">{t.meals.newSideTitle}</p>
+                <div className="border dark:border-gray-600 rounded-xl p-3 bg-amber-50 dark:bg-amber-950/50 space-y-2">
+                  <p className="text-xs font-semibold text-gray-600 dark:text-gray-300">{t.meals.newSideTitle}</p>
                   <input
-                    className="w-full border rounded-xl px-3 py-2.5 text-sm bg-white"
+                    className="w-full border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
                     placeholder={t.meals.newSideNamePlaceholder}
                     value={newSideName}
                     onChange={(e) => setNewSideName(e.target.value)}
@@ -413,7 +413,7 @@ export default function Meals() {
                   />
                   <div className="flex gap-2">
                     <select
-                      className="flex-1 border rounded-xl px-3 py-2.5 text-sm bg-white"
+                      className="flex-1 border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
                       value={newSideCatId}
                       onChange={(e) => setNewSideCatId(e.target.value)}
                     >
@@ -425,7 +425,7 @@ export default function Meals() {
                       <button
                         type="button"
                         onClick={() => setShowNewSideCat(true)}
-                        className="px-3 py-2.5 border rounded-xl text-amber-600 hover:bg-amber-50 text-sm font-medium flex items-center gap-1 flex-shrink-0 bg-white"
+                        className="px-3 py-2.5 border dark:border-gray-600 rounded-xl text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 text-sm font-medium flex items-center gap-1 flex-shrink-0 bg-white dark:bg-gray-700"
                       >
                         <Plus size={14} /> {t.meals.newCategoryBtn}
                       </button>
@@ -434,7 +434,7 @@ export default function Meals() {
                   {showNewSideCat && (
                     <div className="flex gap-2">
                       <input
-                        className="flex-1 border rounded-xl px-3 py-2.5 text-sm bg-white"
+                        className="flex-1 border dark:border-gray-600 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
                         placeholder={t.meals.categoryNamePlaceholder}
                         value={newSideCatName}
                         onChange={(e) => setNewSideCatName(e.target.value)}
@@ -451,7 +451,7 @@ export default function Meals() {
                       <button
                         type="button"
                         onClick={() => { setShowNewSideCat(false); setNewSideCatName(''); }}
-                        className="p-2.5 border rounded-xl text-gray-500 flex-shrink-0 bg-white"
+                        className="p-2.5 border dark:border-gray-600 rounded-xl text-gray-500 dark:text-gray-400 flex-shrink-0 bg-white dark:bg-gray-700"
                       >
                         <X size={16} />
                       </button>
@@ -469,7 +469,7 @@ export default function Meals() {
                     <button
                       type="button"
                       onClick={() => { setShowNewSide(false); setNewSideName(''); setShowNewSideCat(false); setNewSideCatName(''); }}
-                      className="px-4 border rounded-xl text-gray-600 text-sm"
+                      className="px-4 border dark:border-gray-600 rounded-xl text-gray-600 dark:text-gray-300 text-sm"
                     >
                       {t.meals.cancelInline}
                     </button>
@@ -487,9 +487,9 @@ export default function Meals() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.meals.recipeLabel}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">{t.meals.recipeLabel}</label>
               <textarea
-                className="w-full border rounded-xl px-4 py-3 text-sm min-h-[100px] resize-none"
+                className="w-full border dark:border-gray-600 rounded-xl px-4 py-3 text-sm min-h-[100px] resize-none bg-white dark:bg-gray-700 dark:text-gray-100"
                 value={form.recipe}
                 onChange={(e) => setForm((f) => ({ ...f, recipe: e.target.value }))}
                 placeholder={t.meals.recipePlaceholder}
@@ -502,7 +502,7 @@ export default function Meals() {
             >
               {t.meals.saveBtn}
             </button>
-            <button onClick={close} className="w-full border py-3.5 rounded-xl font-medium text-gray-600">
+            <button onClick={close} className="w-full border dark:border-gray-600 py-3.5 rounded-xl font-medium text-gray-600 dark:text-gray-300">
               {t.meals.cancelBtn}
             </button>
           </div>
