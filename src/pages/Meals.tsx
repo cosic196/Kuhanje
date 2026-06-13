@@ -308,23 +308,17 @@ export default function Meals() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Traje dana</label>
               <div className="flex items-center gap-3">
-                <input
-                  type="number"
-                  className="w-20 border rounded-xl px-4 py-3 text-center"
-                  min={1}
-                  max={7}
+                <select
+                  className="border rounded-xl px-4 py-3"
                   value={form.daysCount ?? 1}
-                  onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      daysCount: Math.max(1, Math.min(7, parseInt(e.target.value) || 1)),
-                    }))
-                  }
-                />
+                  onChange={(e) => setForm((f) => ({ ...f, daysCount: parseInt(e.target.value) }))}
+                >
+                  {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
                 <span className="text-sm text-gray-500">
-                  {(form.daysCount ?? 1) === 1
-                    ? 'dan (standardno)'
-                    : `uzastopna dana u rasporedu`}
+                  {(form.daysCount ?? 1) === 1 ? 'dan (standardno)' : 'uzastopna dana'}
                 </span>
               </div>
             </div>
