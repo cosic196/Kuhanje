@@ -88,6 +88,7 @@ export interface PlanDay {
   sideId: string;
   notes: string;
   isSpanContinuation?: boolean;
+  skipped?: boolean;
 }
 
 export interface Plan {

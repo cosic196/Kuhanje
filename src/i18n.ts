@@ -44,6 +44,8 @@ export interface Translations {
     errorRegenerate: string;
     errorRegenerateShort: string;
     notSelected: string;
+    skipDay: string;
+    skipped: string;
   };
   planDetail: {
     notFound: string;
@@ -58,6 +60,9 @@ export interface Translations {
     deselectAll: string;
     selectAll: string;
     notSelected: string;
+    skipDay: string;
+    skipped: string;
+    skipDayLabel: string;
     continuation: string;
     mealIngredients: string;
     sideIngredients: string;
@@ -250,6 +255,8 @@ export const translations: Record<Language, Translations> = {
       errorRegenerate: 'Nije moguće regenerirati dane. Pokušajte opet ili smanjite ograničenja.',
       errorRegenerateShort: 'Greška pri regeneriranju.',
       notSelected: 'Nije odabrano',
+      skipDay: 'Preskoči dan',
+      skipped: 'Preskočen',
     },
     planDetail: {
       notFound: 'Plan nije pronađen.',
@@ -264,6 +271,9 @@ export const translations: Record<Language, Translations> = {
       deselectAll: 'Odznači sve',
       selectAll: 'Označi sve',
       notSelected: 'Nije odabrano',
+      skipDay: 'Preskoči dan',
+      skipped: 'Preskočeno',
+      skipDayLabel: 'Preskoči ovaj dan',
       continuation: 'nastavak',
       mealIngredients: 'Namirnice jela:',
       sideIngredients: 'Namirnice priloga:',
@@ -454,6 +464,8 @@ export const translations: Record<Language, Translations> = {
       errorRegenerate: 'Cannot regenerate days. Try again or loosen the constraints.',
       errorRegenerateShort: 'Error regenerating.',
       notSelected: 'Not selected',
+      skipDay: 'Skip day',
+      skipped: 'Skipped',
     },
     planDetail: {
       notFound: 'Plan not found.',
@@ -468,6 +480,9 @@ export const translations: Record<Language, Translations> = {
       deselectAll: 'Deselect all',
       selectAll: 'Select all',
       notSelected: 'Not selected',
+      skipDay: 'Skip day',
+      skipped: 'Skipped',
+      skipDayLabel: 'Skip this day',
       continuation: 'continued',
       mealIngredients: 'Meal ingredients:',
       sideIngredients: 'Side ingredients:',

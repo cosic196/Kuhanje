@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Calendar, Trash2, Loader2, ChevronRight, Check, RefreshCw } from 'lucide-react';
+import { Plus, Calendar, Trash2, Loader2, ChevronRight, Check, RefreshCw, Ban } from 'lucide-react';
 import { useApp } from '../AppContext';
 import { useLang } from '../LanguageContext';
 import Modal from '../components/Modal';
@@ -23,6 +23,7 @@ export default function Plans() {
 
   const [proposedPlan, setProposedPlan] = useState<Plan | null>(null);
   const [keptDays, setKeptDays] = useState<Set<number>>(new Set());
+  const [skippedDays, setSkippedDays] = useState<Set<number>>(new Set());
 
   const removePlan = (id: string) => {
     if (!confirm(t.plans.deletePlan)) return;
@@ -36,6 +37,7 @@ export default function Plans() {
   const openNew = () => {
     setProposedPlan(null);
     setKeptDays(new Set());
+    setSkippedDays(new Set());
     setError('');
     setPlanName('');
     setStartDate(new Date().toISOString().slice(0, 10));
@@ -46,6 +48,7 @@ export default function Plans() {
     setShowNew(false);
     setProposedPlan(null);
     setKeptDays(new Set());
+    setSkippedDays(new Set());
     setError('');
   };
 
@@ -74,7 +77,7 @@ export default function Plans() {
 
   const doRegenerateSelected = () => {
     if (!proposedPlan) return;
-    const toRegen = proposedPlan.days.map((_, i) => i).filter((i) => !keptDays.has(i));
+    const toRegen = proposedPlan.days.map((_, i) => i).filter((i) => !keptDays.has(i) && !skippedDays.has(i));
     if (toRegen.length === 0) return;
     setError('');
     setGenerating(true);
@@ -98,11 +101,20 @@ export default function Plans() {
 
   const confirmPlan = () => {
     if (!proposedPlan) return;
-    setData((p) => ({ ...p, plans: [proposedPlan, ...p.plans].slice(0, 10) }));
+    const finalPlan = {
+      ...proposedPlan,
+      days: proposedPlan.days.map((day, idx) =>
+        skippedDays.has(idx)
+          ? { ...day, mealId: '', sideId: '', skipped: true as const }
+          : day
+      ),
+    };
+    setData((p) => ({ ...p, plans: [finalPlan, ...p.plans].slice(0, 10) }));
     cancelNew();
   };
 
   const toggleDay = (idx: number) => {
+    if (skippedDays.has(idx)) return;
     setKeptDays((prev) => {
       const next = new Set(prev);
       if (next.has(idx)) next.delete(idx);
@@ -111,10 +123,21 @@ export default function Plans() {
     });
   };
 
+  const toggleSkipDay = (e: React.MouseEvent, idx: number) => {
+    e.stopPropagation();
+    setSkippedDays((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+    setKeptDays((prev) => new Set([...prev, idx]));
+  };
+
   const toggleAll = () => {
     if (!proposedPlan) return;
     const allKept = keptDays.size === proposedPlan.days.length;
-    setKeptDays(allKept ? new Set() : new Set(proposedPlan.days.map((_, i) => i)));
+    setKeptDays(allKept ? new Set([...skippedDays]) : new Set(proposedPlan.days.map((_, i) => i)));
   };
 
   const formatDateRange = (plan: { startDate: string; days: unknown[] }) => {
@@ -124,7 +147,9 @@ export default function Plans() {
     return `${start.toLocaleDateString(t.locale, { day: 'numeric', month: 'short' })} – ${end.toLocaleDateString(t.locale, { day: 'numeric', month: 'short', year: 'numeric' })}`;
   };
 
-  const uncheckedCount = proposedPlan ? proposedPlan.days.length - keptDays.size : 0;
+  const uncheckedCount = proposedPlan
+    ? proposedPlan.days.filter((_, i) => !keptDays.has(i) && !skippedDays.has(i)).length
+    : 0;
   const startDateFormatted = new Date(startDate).toLocaleDateString(t.locale);
 
   return (
@@ -264,22 +289,29 @@ export default function Plans() {
                   const meal = data.meals.find((m) => m.id === day.mealId);
                   const side = data.sides.find((s) => s.id === day.sideId);
                   const isKept = keptDays.has(idx);
+                  const isSkipped = skippedDays.has(idx);
                   return (
-                    <button
+                    <div
                       key={idx}
                       onClick={() => toggleDay(idx)}
-                      className={`w-full flex items-center gap-2.5 rounded-xl border px-3 py-2 text-left transition-colors ${
-                        isKept
-                          ? 'bg-white border-gray-200'
-                          : 'bg-gray-50 border-dashed border-amber-300'
+                      className={`w-full flex items-center gap-2.5 rounded-xl border px-3 py-2 text-left transition-colors cursor-pointer select-none ${
+                        isSkipped
+                          ? 'bg-gray-50 border-gray-200'
+                          : isKept
+                            ? 'bg-white border-gray-200'
+                            : 'bg-gray-50 border-dashed border-amber-300'
                       }`}
                     >
                       <div
                         className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                          isKept ? 'bg-amber-600 border-amber-600' : 'border-gray-300 bg-white'
+                          isSkipped
+                            ? 'border-gray-200 bg-gray-100'
+                            : isKept
+                              ? 'bg-amber-600 border-amber-600'
+                              : 'border-gray-300 bg-white'
                         }`}
                       >
-                        {isKept && <Check size={11} className="text-white" />}
+                        {isKept && !isSkipped && <Check size={11} className="text-white" />}
                       </div>
                       <div className="flex-shrink-0 w-6 h-6 rounded bg-amber-100 flex items-center justify-center text-xs font-bold text-amber-700">
                         {idx + 1}
@@ -288,16 +320,31 @@ export default function Plans() {
                         <p className="text-[11px] text-gray-400 leading-none mb-0.5">
                           {formatDayShort(day.date, t.daysShort, t.locale)}
                         </p>
-                        <p className={`text-sm font-medium truncate ${isKept ? 'text-gray-800' : 'text-gray-400'}`}>
-                          {meal?.name ?? (
-                            <span className="text-red-400 italic text-xs">{t.plans.notSelected}</span>
-                          )}
-                          {side && (
-                            <span className="font-normal text-gray-400"> + {side.name}</span>
-                          )}
-                        </p>
+                        {isSkipped ? (
+                          <p className="text-xs text-gray-400 italic">{t.plans.skipped}</p>
+                        ) : (
+                          <p className={`text-sm font-medium truncate ${isKept ? 'text-gray-800' : 'text-gray-400'}`}>
+                            {meal?.name ?? (
+                              <span className="text-red-400 italic text-xs">{t.plans.notSelected}</span>
+                            )}
+                            {side && (
+                              <span className="font-normal text-gray-400"> + {side.name}</span>
+                            )}
+                          </p>
+                        )}
                       </div>
-                    </button>
+                      <button
+                        onClick={(e) => toggleSkipDay(e, idx)}
+                        title={isSkipped ? t.plans.skipped : t.plans.skipDay}
+                        className={`p-1 rounded-lg flex-shrink-0 transition-colors ${
+                          isSkipped
+                            ? 'text-red-400 bg-red-50 hover:bg-red-100'
+                            : 'text-gray-300 hover:text-gray-500 hover:bg-gray-100'
+                        }`}
+                      >
+                        <Ban size={14} />
+                      </button>
+                    </div>
                   );
                 })}
               </div>

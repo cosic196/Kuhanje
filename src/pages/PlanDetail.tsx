@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft, Printer, ShoppingCart, Pencil, Check, ChevronDown, ChevronUp,
-  RefreshCw, UtensilsCrossed, Loader2, X, CornerDownRight,
+  RefreshCw, UtensilsCrossed, Loader2, X, CornerDownRight, Ban,
 } from 'lucide-react';
 import { useApp } from '../AppContext';
 import { useLang } from '../LanguageContext';
@@ -38,6 +38,7 @@ function buildShoppingItems(
 
   for (const day of days) {
     if (day.isSpanContinuation) continue;
+    if (day.skipped) continue;
     if (day.mealId) {
       const meal = data.meals.find((m) => m.id === day.mealId);
       if (meal) addItems(meal.ingredients);
@@ -303,6 +304,7 @@ export default function PlanDetail() {
               const isExpanded = expandedDayIdx === idx;
               const isKept = !regenMode || keptDays.has(idx);
               const isContinuation = day.isSpanContinuation === true;
+              const isSkipped = day.skipped === true;
 
               return (
                 <div
@@ -361,10 +363,16 @@ export default function PlanDetail() {
                             {isContinuation && (
                               <CornerDownRight size={13} className="text-amber-400 flex-shrink-0" />
                             )}
-                            <p className={`font-semibold text-sm truncate ${isContinuation ? 'text-gray-500' : 'text-gray-800'}`}>
-                              {meal ? meal.name : <span className="text-red-400 italic">{t.planDetail.notSelected}</span>}
-                              {side && <span className="text-gray-400 font-normal"> + {side.name}</span>}
-                            </p>
+                            {isSkipped ? (
+                              <span className="flex items-center gap-1 text-xs text-gray-400 italic bg-gray-100 px-2 py-0.5 rounded">
+                                <Ban size={11} /> {t.planDetail.skipped}
+                              </span>
+                            ) : (
+                              <p className={`font-semibold text-sm truncate ${isContinuation ? 'text-gray-500' : 'text-gray-800'}`}>
+                                {meal ? meal.name : <span className="text-red-400 italic">{t.planDetail.notSelected}</span>}
+                                {side && <span className="text-gray-400 font-normal"> + {side.name}</span>}
+                              </p>
+                            )}
                             {isContinuation && (
                               <span className="text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded flex-shrink-0">
                                 {t.planDetail.continuation}
@@ -541,6 +549,7 @@ function EditDayForm({
   onCancel: () => void;
 }) {
   const { t } = useLang();
+  const [skipped, setSkipped] = useState(day.skipped === true);
   const [mealId, setMealId] = useState(day.mealId);
   const [sideId, setSideId] = useState(day.sideId);
   const [notes, setNotes] = useState(day.notes);
@@ -550,28 +559,56 @@ function EditDayForm({
     ? data.sides.filter((s) => selectedMeal.possibleSideIds.includes(s.id))
     : data.sides;
 
+  const handleSave = () => {
+    if (skipped) {
+      onSave({ ...day, mealId: '', sideId: '', notes, skipped: true });
+    } else {
+      onSave({ ...day, mealId, sideId, notes, skipped: undefined });
+    }
+  };
+
   return (
     <div className="space-y-3">
-      <select
-        className="w-full border rounded-xl px-4 py-3 text-sm"
-        value={mealId}
-        onChange={(e) => { setMealId(e.target.value); setSideId(''); }}
+      <button
+        onClick={() => setSkipped((v) => !v)}
+        className={`w-full flex items-center gap-2.5 px-4 py-3 rounded-xl border text-sm font-medium transition-colors ${
+          skipped
+            ? 'bg-red-50 border-red-200 text-red-600'
+            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+        }`}
       >
-        <option value="">{t.planDetail.selectMeal}</option>
-        {data.meals.map((m) => (
-          <option key={m.id} value={m.id}>{m.name}</option>
-        ))}
-      </select>
-      <select
-        className="w-full border rounded-xl px-4 py-3 text-sm"
-        value={sideId}
-        onChange={(e) => setSideId(e.target.value)}
-      >
-        <option value="">{t.planDetail.noSide}</option>
-        {availableSides.map((s) => (
-          <option key={s.id} value={s.id}>{s.name}</option>
-        ))}
-      </select>
+        <Ban size={16} className={skipped ? 'text-red-500' : 'text-gray-400'} />
+        {t.planDetail.skipDayLabel}
+        <div className={`ml-auto w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${skipped ? 'bg-red-500' : 'bg-gray-200'}`}>
+          <div className={`w-4 h-4 rounded-full bg-white shadow transition-transform ${skipped ? 'translate-x-4' : 'translate-x-0'}`} />
+        </div>
+      </button>
+
+      {!skipped && (
+        <>
+          <select
+            className="w-full border rounded-xl px-4 py-3 text-sm"
+            value={mealId}
+            onChange={(e) => { setMealId(e.target.value); setSideId(''); }}
+          >
+            <option value="">{t.planDetail.selectMeal}</option>
+            {data.meals.map((m) => (
+              <option key={m.id} value={m.id}>{m.name}</option>
+            ))}
+          </select>
+          <select
+            className="w-full border rounded-xl px-4 py-3 text-sm"
+            value={sideId}
+            onChange={(e) => setSideId(e.target.value)}
+          >
+            <option value="">{t.planDetail.noSide}</option>
+            {availableSides.map((s) => (
+              <option key={s.id} value={s.id}>{s.name}</option>
+            ))}
+          </select>
+        </>
+      )}
+
       <input
         className="w-full border rounded-xl px-4 py-3 text-sm"
         placeholder={t.planDetail.notesPlaceholder}
@@ -580,7 +617,7 @@ function EditDayForm({
       />
       <div className="flex gap-2">
         <button
-          onClick={() => onSave({ ...day, mealId, sideId, notes })}
+          onClick={handleSave}
           className="flex-1 bg-amber-600 text-white py-3 rounded-xl text-sm font-medium"
         >
           {t.planDetail.saveBtn}
